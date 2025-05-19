@@ -1,2 +1,2 @@
 # bayesian-optimization
-Bayesian Optimization
+This repo contains my work with Bayesian optimization including tutorials, presentations, and examples.
