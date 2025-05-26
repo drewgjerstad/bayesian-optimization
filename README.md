@@ -32,3 +32,31 @@ optimization and related topics. The BibTeX entries can be found in the
  * _Bayesian Optimization_ by Roman Garnett (2023)
  * _Bayesian Optimization: Theory and Practice Using Python_ by Peng Liu (2023)
  * _Gaussian Processes for Machine Learning_ by Rasmussen & Williams (2019)
+
+<!---
+Topics
+ - Introduction to Bayesian optimization
+    - Garnett Chapter 1, Liu Chapter 1, R+W Chapter 1
+ - Gaussian Processes
+    - Garnett Chapter 2/3, Liu Chapter 2, R+W Appendix B
+ - Model Assessment and Selection
+    - Garnett Chapter 4
+ - Decision Theory
+    - Garnett Chapter 5, Liu Chapter 3
+ - Utility Functions
+    - Garnett Chapter 6
+ - Bayesian Optimization Policies
+    - Garnett Chapter 7
+ - Computing Policies w/ GPs
+    - Garnett Chapter 8
+ - Implementation
+    - Garnett Chapter 9
+ - Theoretical Analysis
+    - Garnett Chapter 10
+ - History of BO
+    - Garnett Chapter 11
+ - Regression
+    - R+W Chapter 2
+ - Classification
+    - R+W Chapter 3
+--->
