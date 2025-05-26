@@ -12,6 +12,11 @@ optimization and related topics.
 ## 📁 `examples`
 This directory contains notebooks exploring various examples of Bayesian
 optimization and its applications.
+ * [Introduction to GPyTorch and GAUCHE](examples/gpytorch_and_gauche.ipynb)  
+    This notebook synthesizes information from GPyTorch and GAUCHE's
+    documentation regarding Gaussian processes for machine learning and how to
+    apply them to irregular-structured input representations (i.e., molecular,
+    graph, etc.).
 
 
 ## 📁 `slides`
