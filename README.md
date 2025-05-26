@@ -17,3 +17,9 @@ optimization and its applications.
 ## 📁 `slides`
 This directory contains presentations covering Bayesian optimization and related
 topics.
+
+
+## 📚 References
+Below is a list of reference texts, papers, and other sources on Bayesian
+optimization and related topics. The BibTeX entries can be found in the
+[`bibliography.bib`](bibliography.bib) file.
