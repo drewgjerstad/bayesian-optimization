@@ -5,8 +5,8 @@ myself and others can use to better understand (and utilize) Bayesian
 optimization.
 
 ## 📁 `docs`
-This directory contains documents (i.e., tutorials) covering Bayesian
-optimization and related topics.
+This directory contains documents (i.e., notes, tutorials, etc.) covering
+Bayesian optimization and related topics.
 
 
 ## 📁 `examples`
@@ -21,7 +21,8 @@ optimization and its applications.
 
 ## 📁 `slides`
 This directory contains presentations covering Bayesian optimization and related
-topics.
+topics. Note that several of the presentations are analog to documents in the
+`docs` directory and are simply in a different format.
 
 
 ## 📚 References
@@ -40,12 +41,12 @@ Topics
  - Gaussian Processes
     - Garnett Chapter 2/3, Liu Chapter 2, R+W Appendix B
  - Model Assessment and Selection
-    - Garnett Chapter 4
+    - Garnett Chapter 4, R+W Chapter 5
  - Decision Theory
     - Garnett Chapter 5, Liu Chapter 3
  - Utility Functions
     - Garnett Chapter 6
- - Bayesian Optimization Policies
+ - Policies
     - Garnett Chapter 7
  - Computing Policies w/ GPs
     - Garnett Chapter 8
@@ -55,8 +56,8 @@ Topics
     - Garnett Chapter 10
  - History of BO
     - Garnett Chapter 11
- - Regression
+ - GP Regression
     - R+W Chapter 2
- - Classification
+ - GP Classification
     - R+W Chapter 3
 --->
