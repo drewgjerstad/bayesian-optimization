@@ -7,6 +7,18 @@ optimization.
 ## 📁 `docs`
 This directory contains documents (i.e., notes, tutorials, etc.) covering
 Bayesian optimization and related topics.
+1. Introduction to Bayesian Optimization
+2. Gaussian Processes
+3. Model Assessment and Selection
+4. Decision Theory
+5. Utility Functions
+6. Policies
+7. Computing Policies
+8. Implementation
+9. Theoretical Analysis
+10. History of Bayesian Optimization
+11. Gaussian Process Regression
+12. Gaussian Process Classification
 
 
 ## 📁 `examples`
@@ -19,12 +31,6 @@ optimization and its applications.
     graph, etc.).
 
 
-## 📁 `slides`
-This directory contains presentations covering Bayesian optimization and related
-topics. Note that several of the presentations are analog to documents in the
-`docs` directory and are simply in a different format.
-
-
 ## 📚 References
 Below is a list of reference texts, papers, and other sources on Bayesian
 optimization and related topics. The BibTeX entries can be found in the
@@ -34,10 +40,11 @@ optimization and related topics. The BibTeX entries can be found in the
  * _Bayesian Optimization: Theory and Practice Using Python_ by Peng Liu (2023)
  * _Gaussian Processes for Machine Learning_ by Rasmussen & Williams (2019)
 
+
 <!---
 Topics
  - Introduction to Bayesian optimization
-    - Garnett Chapter 1, Liu Chapter 1, R+W Chapter 1
+    - Garnett Chapter 1, Liu Chapter 1, R+W Chapter 1 (Bayes Opt Loop paper?)
  - Gaussian Processes
     - Garnett Chapter 2/3, Liu Chapter 2, R+W Appendix B
  - Model Assessment and Selection
