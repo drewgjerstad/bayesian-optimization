@@ -7,28 +7,27 @@ optimization.
 ## 📁 `docs`
 This directory contains documents (i.e., notes, tutorials, etc.) covering
 Bayesian optimization and related topics.
-1. Introduction to Bayesian Optimization
-2. Gaussian Processes
-3. Model Assessment and Selection
-4. Decision Theory
-5. Utility Functions
-6. Policies
-7. Computing Policies
-8. Implementation
-9. Theoretical Analysis
-10. History of Bayesian Optimization
-11. Gaussian Process Regression
-12. Gaussian Process Classification
+
+* [**Introduction to Bayesian Optimization**](docs/01-introduction/main.pdf)
+* **Gaussian Processes**
+* **Covariance Functions (Kernels)**
+* **Decision Theory**
+* **Utility Functions**
+* **Acquisition Functions**
+* **Implementation**
+* **Theoretical Analysis**
+* **GP Regression**
+* **GP Classification**
 
 
 ## 📁 `examples`
 This directory contains notebooks exploring various examples of Bayesian
 optimization and its applications.
- * [Introduction to GPyTorch and GAUCHE](examples/gpytorch_and_gauche.ipynb)  
-    This notebook synthesizes information from GPyTorch and GAUCHE's
-    documentation regarding Gaussian processes for machine learning and how to
-    apply them to irregular-structured input representations (i.e., molecular,
-    graph, etc.).
+ * [**Introduction to GPyTorch and GAUCHE**](examples/gpytorch_and_gauche.ipynb)  
+    _This notebook synthesizes information from GPyTorch and GAUCHE's_
+    _documentation regarding Gaussian processes for machine learning and how to_
+    _apply them to irregular-structured input representations (i.e., molecular,_
+    _graph, etc.)._
 
 
 ## 📚 References
@@ -44,25 +43,21 @@ optimization and related topics. The BibTeX entries can be found in the
 <!---
 Topics
  - Introduction to Bayesian optimization
-    - Garnett Chapter 1, Liu Chapter 1, R+W Chapter 1 (Bayes Opt Loop paper?)
+    - Garnett Chapter 1, Liu Chapter 1, R+W Chapter 1, Shahriari Paper
  - Gaussian Processes
     - Garnett Chapter 2/3, Liu Chapter 2, R+W Appendix B
- - Model Assessment and Selection
-    - Garnett Chapter 4, R+W Chapter 5
+ - Covariance Functions
+    - R+W Chapter 4
  - Decision Theory
     - Garnett Chapter 5, Liu Chapter 3
  - Utility Functions
     - Garnett Chapter 6
- - Policies
-    - Garnett Chapter 7
- - Computing Policies w/ GPs
-    - Garnett Chapter 8
+ - Acquisition Functions
+    - Garnett Chapter 7/8
  - Implementation
     - Garnett Chapter 9
  - Theoretical Analysis
     - Garnett Chapter 10
- - History of BO
-    - Garnett Chapter 11
  - GP Regression
     - R+W Chapter 2
  - GP Classification
