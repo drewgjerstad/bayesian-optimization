@@ -33,7 +33,7 @@ optimization and its applications.
 ## 📚 References
 Below is a list of reference texts, papers, and other sources on Bayesian
 optimization and related topics. The BibTeX entries can be found in the
-[`bibliography.bib`](bibliography.bib) file.
+[**`bibliography.bib`**](bibliography.bib) file.
 
  * _Bayesian Optimization_ by Roman Garnett (2023)
  * _Bayesian Optimization: Theory and Practice Using Python_ by Peng Liu (2023)
