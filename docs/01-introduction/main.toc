@@ -1,3 +1,10 @@
 \beamer@sectionintoc {1}{Introduction}{3}{0}{1}
-\beamer@sectionintoc {2}{Main Content}{4}{0}{2}
-\beamer@subsectionintoc {2}{1}{Main Content Subsection}{5}{0}{2}
+\beamer@sectionintoc {2}{Motivation}{4}{0}{2}
+\beamer@sectionintoc {3}{Optimization Foundations}{6}{0}{3}
+\beamer@sectionintoc {4}{Bayesian Foundations}{8}{0}{4}
+\beamer@sectionintoc {5}{The Bayesian Approach}{10}{0}{5}
+\beamer@sectionintoc {6}{Bayesian Optimization Workflow}{12}{0}{6}
+\beamer@subsectionintoc {6}{1}{Surrogate Models}{14}{0}{6}
+\beamer@subsectionintoc {6}{2}{Acquisition Functions}{16}{0}{6}
+\beamer@subsectionintoc {6}{3}{Acquisition Function Optimizer}{17}{0}{6}
+\beamer@sectionintoc {7}{References}{18}{0}{7}
