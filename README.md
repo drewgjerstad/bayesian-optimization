@@ -23,6 +23,8 @@ Bayesian optimization and related topics.
 ## 📁 `examples`
 This directory contains notebooks exploring various examples of Bayesian
 optimization and its applications.
+ * **Introduction to Bayesian Optimization**
+ * **Bayesian Statistics**
  * [**Introduction to GPyTorch and GAUCHE**](examples/gpytorch_and_gauche.ipynb)  
     _This notebook synthesizes information from GPyTorch and GAUCHE's_
     _documentation regarding Gaussian processes for machine learning and how to_
