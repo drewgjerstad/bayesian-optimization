@@ -1,10 +1,10 @@
 \beamer@sectionintoc {1}{Introduction}{3}{0}{1}
 \beamer@sectionintoc {2}{Motivation}{4}{0}{2}
-\beamer@sectionintoc {3}{Optimization Foundations}{6}{0}{3}
-\beamer@sectionintoc {4}{Bayesian Foundations}{8}{0}{4}
-\beamer@sectionintoc {5}{The Bayesian Approach}{10}{0}{5}
-\beamer@sectionintoc {6}{Bayesian Optimization Workflow}{12}{0}{6}
-\beamer@subsectionintoc {6}{1}{Surrogate Models}{14}{0}{6}
-\beamer@subsectionintoc {6}{2}{Acquisition Functions}{16}{0}{6}
-\beamer@subsectionintoc {6}{3}{Acquisition Function Optimizer}{17}{0}{6}
-\beamer@sectionintoc {7}{References}{18}{0}{7}
+\beamer@sectionintoc {3}{Optimization Foundations}{12}{0}{3}
+\beamer@sectionintoc {4}{Bayesian Foundations}{14}{0}{4}
+\beamer@sectionintoc {5}{The Bayesian Approach}{16}{0}{5}
+\beamer@sectionintoc {6}{Bayesian Optimization Workflow}{18}{0}{6}
+\beamer@subsectionintoc {6}{1}{Surrogate Models}{20}{0}{6}
+\beamer@subsectionintoc {6}{2}{Acquisition Functions}{22}{0}{6}
+\beamer@subsectionintoc {6}{3}{Acquisition Function Optimizer}{23}{0}{6}
+\beamer@sectionintoc {7}{References}{24}{0}{7}
