@@ -8,7 +8,7 @@ optimization.
 This directory contains documents (i.e., notes, tutorials, etc.) covering
 Bayesian optimization and related topics.
 
-* [**Introduction to Bayesian Optimization**](docs/01-introduction/main.pdf)
+* [**Introduction to Bayesian Optimization**](docs/01_introduction.ipynb)
 * **Gaussian Processes**
 * **Covariance Functions (Kernels)**
 * **Decision Theory**
