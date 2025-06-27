@@ -5,8 +5,8 @@ myself and others can use to better understand (and utilize) Bayesian
 optimization.
 
 ## 📁 `docs`
-This directory contains documents (i.e., notes, tutorials, etc.) covering
-Bayesian optimization and related topics.
+This directory contains notebooks consisting of notes and tutorials for Bayesian
+optimization and related topics.
 
 * [**Introduction to Bayesian Optimization**](docs/01_introduction.ipynb)
 * **Gaussian Processes**
@@ -23,7 +23,6 @@ Bayesian optimization and related topics.
 ## 📁 `examples`
 This directory contains notebooks exploring various examples of Bayesian
 optimization and its applications.
- * **Introduction to Bayesian Optimization**
  * **Bayesian Statistics**
  * [**Introduction to GPyTorch and GAUCHE**](examples/gpytorch_and_gauche.ipynb)  
     _This notebook synthesizes information from GPyTorch and GAUCHE's_
