@@ -30,6 +30,10 @@ optimization and its applications.
     _apply them to irregular-structured input representations (i.e., molecular,_
     _graph, etc.)._
 
+## 📁 `src`
+This directory contains from-scratch implementations of Bayesian optimization
+methods and the methods of related topics.
+
 
 ## 📚 References
 Below is a list of reference texts, papers, and other sources on Bayesian
