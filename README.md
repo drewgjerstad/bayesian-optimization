@@ -1,4 +1,4 @@
-# bayesian-optimization
+# Bayesian Optimization
 This repo contains my work with Bayesian optimization and related topics. The
 primary goal of this repo is to develop and curate a set of resources that
 myself and others can use to better understand (and utilize) Bayesian
