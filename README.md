@@ -20,7 +20,7 @@ optimization and related topics.
 * [**Introduction to Bayesian Optimization**](docs/01_introduction.ipynb)
 * **Gaussian Processes**
 * **Covariance Functions (Kernels)**
-* **Decision Theory**
+* [**Decision Theory**](docs/04_decision_theory.ipynb)
 * **Utility Functions**
 * **Acquisition Functions**
 * **Implementation**
