@@ -5,23 +5,18 @@ myself and others can use to better understand (and utilize) Bayesian
 optimization.
 
 > [!NOTE]
-> When accessing the notebooks linked below, no te that some of the internal
-> links––primarily used for navigation––may not work on all platforms. While
-> they are functional in VS Code, I have noticed issues with their functionality
-> in GitHub Preview and on popular rendering sites such as _nbviewer_. If you
-> have any suggestions or know of a workaround, feel free to
-> [raise an issue](https://github.com/drewgjerstad/bayesian-optimization/issues/new/choose)
-> and let me know.
+> If you find any issues/typos or have any suggestions, feel free to
+> [raise an issue](https://github.com/drewgjerstad/bayesian-optimization/issues/new/choose).
 
 ## 📁 `docs`
 This directory contains notebooks consisting of notes and tutorials for Bayesian
 optimization and related topics.
 
-* [**Introduction to Bayesian Optimization**](docs/01_introduction.ipynb)
+* [**Introduction to Bayesian Optimization**](docs/01-introduction/01-introduction.pdf)
 * **Gaussian Processes**
 * **Covariance Functions (Kernels)**
-* [**Decision Theory**](docs/04_decision_theory.ipynb)
-* **Utility Functions**
+* [**Decision Theory**](docs/04-decision-theory/04-decision-theory.pdf)
+* [**Utility Functions**](docs/05-utility-functions/05-utility-functions.pdf)
 * **Acquisition Functions**
 * **Implementation**
 * **Theoretical Analysis**
