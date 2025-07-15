@@ -6,7 +6,7 @@ optimization.
 
 > [!NOTE]
 > If you find any issues/typos or have any suggestions, feel free to
-> [raise an issue](https://github.com/drewgjerstad/bayesian-optimization/issues/new/choose).
+> [raise an issue](https://github.com/drewgjerstad/bayesian-optimization/issues/new/choose) and let me know.
 
 ## 📁 `docs`
 This directory contains notebooks consisting of notes and tutorials for Bayesian
