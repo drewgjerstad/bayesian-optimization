@@ -6,16 +6,19 @@ optimization.
 
 > [!NOTE]
 > If you find any issues/typos or have any suggestions, feel free to
-> [raise an issue](https://github.com/drewgjerstad/bayesian-optimization/issues/new/choose) and let me know.
+> [raise an issue](
+>  https://github.com/drewgjerstad/bayesian-optimization/issues/new/choose) and
+> let me know.
 
 ## 📁 `docs`
 This directory contains notebooks consisting of notes and tutorials for Bayesian
 optimization and related topics.
 
-* [**Introduction to Bayesian Optimization**](docs/01-introduction/01-introduction.pdf)
+* [**Introduction to Bayesian Optimization**](
+   docs/01-introduction/01-introduction.pdf)
 * **Gaussian Processes**
 * **Covariance Functions (Kernels)**
-* [**Decision Theory**](docs/04-decision-theory/04-decision-theory.pdf)
+* [**Bayesian Decision Theory**](docs/04-decision-theory/04-decision-theory.pdf)
 * [**Utility Functions**](docs/05-utility-functions/05-utility-functions.pdf)
 * **Acquisition Functions**
 * **Implementation**
