@@ -20,6 +20,15 @@ format:
 jupyter: conda-env-main-env-py
 ---
 
+```{python}
+#| label: import-dependencies
+#| echo: false
+
+import numpy as np
+import scipy as sp
+import matplotlib.pyplot as plt
+```
+
 \newpage
 # Introduction
 In the notes discussing **Bayesian decision theory**, one of the key components
@@ -127,6 +136,44 @@ restrictive and the other maximally permissive.
    entire domain to be our action space will require us to have faith in the
    objective function model's beliefs, particularly when recommending an
    unvisited point.
+
+```{python}
+#| label: extreme-action-space
+#| echo: false
+
+def objective(x:np.array)->np.array:
+    return np.sin(2*x) * np.cos(x) * 10 + np.sin(0.5 * x) + 0.5 * x
+
+def erroneous_model(x:np.array)->np.array:
+    return np.sin(x) * np.cos(x) * 5 + np.cos(0.25 * x) + 3 * x
+
+x = np.linspace(0, np.pi, 100)
+x_obs = np.array([np.pi/i for i in [18, 12, 7, 5, 3.5, 3, 2.5, 2]])
+fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(10, 4))
+
+# Maximally Restrictive Option
+ax[0].plot(x, objective(x), label="Objective Function", c="k")
+ax[0].scatter(x_obs, objective(x_obs), label="Observations", c="r")
+ax[0].scatter(x[np.argmax(objective(x))], objective(x[np.argmax(objective(x))]),      
+              label="True Optimum", c="b", marker="D")
+ax[0].set_title("Risk of Maximally Restrictive Option")
+ax[0].set_ylim((0, 15))
+ax[0].legend(loc="upper left")
+
+# Maximally Permissive Option
+np.random.seed(1234)
+x_obs = (np.linspace(0, np.pi, 100))[np.random.randint(0, 99, 8)]
+ax[1].plot(x, objective(x), label="Objective Function", c="k")
+ax[1].plot(x, erroneous_model(x), label="Erroneous Model", c="b",
+           linestyle="--")
+ax[1].scatter(x_obs, erroneous_model(x_obs), label="Observations", c="b")
+ax[1].scatter(x_obs, objective(x_obs), label="True Observations", c="k",
+              marker="D")
+ax[1].set_title("Risk of Maximally Permissive Option")
+ax[1].set_ylim((0, 15))
+ax[1].legend(loc="upper left")
+plt.show()
+```
 
 In literature, there have been some suggestions of compromise between the two
 extremes with Garnett citing an example from Osborne et al. wherein the final
@@ -280,6 +327,28 @@ expected utility of the optimal recommendation is:
     u(\mathcal{D}) = \max \mu_{\mathcal{D}}(\mathbf{x})
 \end{equation*}
 
+```{python}
+#| label: simple-reward-example
+#| echo: false
+np.random.seed(1234)
+
+def objective(x:np.array)->np.array:
+    return np.sin(0.2 * x) * np.cos(0.1 * x) * 10 + np.sin(0.5 * x) + 0.25 * x
+
+x = np.linspace(0, 50, 1000)
+x_obs = x[np.random.randint(0, x.shape[0], 25)]
+simple_rwd_idx = np.argmax(objective(x_obs))
+plt.figure(figsize=(10, 3))
+plt.plot(x, objective(x), c="k", label="Posterior Mean Function")
+plt.vlines(x_obs[simple_rwd_idx], ymin=0, ymax=objective(x_obs[simple_rwd_idx]),
+           colors="b", linestyles="--", label="Simple Reward")
+plt.scatter(x_obs, objective(x_obs), c="r", label="Observations")
+plt.title("Simple Reward Example")
+plt.ylim((0, 20))
+plt.legend()
+plt.show()
+```
+
 Garnett points out one _technical caveat_: if the returned dataset is empty,
 then the maximum degenerates and will have that $u(\emptyset) = -\infty$.
 Additionally, in the special case where we have exact observations (i.e.,
@@ -305,6 +374,23 @@ mean:
 Consider that by expanding the action space to include the entire domain, which
 includes points where we are inherently uncertain about the objective value at,
 this often leads to a different and potentially more risky recommendation.
+
+```{python}
+#| label: global-reward-example
+#| echo: false
+np.random.seed(1234)
+
+global_rwd_idx = np.argmax(objective(x))
+plt.figure(figsize=(10, 3))
+plt.plot(x, objective(x), c="k", label="Posterior Mean Function")
+plt.vlines(x[global_rwd_idx], ymin=0, ymax=objective(x[global_rwd_idx]),
+           colors="b", linestyles="--", label="Global Reward")
+plt.scatter(x_obs, objective(x_obs), c="r", label="Observations")
+plt.title("Global Reward Example")
+plt.ylim((0, 20))
+plt.legend()
+plt.show()
+```
 
 ## A Tempting, Nonsensical Alternative to Simple Reward
 Here we discuss the tempting, but not entirely rational alternative to the
