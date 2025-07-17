@@ -1,0 +1,21 @@
+---
+title: Computing Acquisition Functions
+author: Drew Gjerstad
+format:
+    pdf:
+        pdf-engine: pdflatex
+        code-fold: false
+        toc: true
+        toc-title: Contents
+        toc-depth: 2
+        number-sections: true
+        number-depth: 2
+        include-in-header:
+           - text: |
+               \usepackage{amsfonts}
+               \usepackage{amsmath}
+               \usepackage{amssymb}
+               \DeclareMathOperator*{\argmax}{\text{arg}\max}
+               \DeclareMathOperator*{\argmin}{\text{arg}\min}
+jupyter: conda-env-main-env-py
+---

@@ -3,6 +3,7 @@ title: Bayesian Decision Theory
 author: Drew Gjerstad
 format:
     pdf:
+        pdf-engine: pdflatex
         code-fold: false
         toc: true
         toc-title: Contents
@@ -453,7 +454,7 @@ Once again, the optimal next-to-last observation maximizes the expected gain:
 Furthermore, it will provide an expected terminal utility of:
 
 \begin{equation*}
-    \u(\mathcal{D}) + \alpha_2^*(\mathcal{D})
+    u(\mathcal{D}) + \alpha_2^*(\mathcal{D})
     \hspace{24pt}
     \alpha_2^*(\mathcal{D}) =
     \max_{x^\prime\in\mathcal{X}}\alpha_2(x^\prime;\mathcal{D})

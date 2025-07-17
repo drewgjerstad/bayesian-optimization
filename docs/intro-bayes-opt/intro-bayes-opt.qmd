@@ -3,6 +3,7 @@ title: Introduction to Bayesian Optimization
 author: Drew Gjerstad
 format:
     pdf:
+        pdf-engine: pdflatex
         code-fold: false
         toc: true
         toc-title: Contents
