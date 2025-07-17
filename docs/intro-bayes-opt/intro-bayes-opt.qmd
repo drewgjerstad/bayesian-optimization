@@ -10,6 +10,7 @@ format:
         toc-depth: 2
         number-sections: true
         number-depth: 2
+        fig-align: default
         include-in-header:
            - text: |
                \usepackage{amsfonts}
@@ -20,148 +21,153 @@ format:
 jupyter: conda-env-main-env-py
 ---
 
+```{python}
+#| label: import-dependencies
+#| echo: false
+
+import numpy as np
+import matplotlib.pyplot as plt
+```
+
 \newpage
 # Introduction
 **Bayesian optimization** refers to an optimization approach that uses Bayesian
 inference to guide the optimizer to make "better" decisions based on
-_uncertainty_. One attractive feature of this approach is its _unparalleled_
-sample efficiency (more on this later). Additionally, _uncertainty_ is inherent
-in all optimization decisions but we can use the Bayesian approach to tackle it,
-and often overcome it, in a strategic manner.
+_uncertainty_. In addition, this approach provides a framework that enables us
+to strategically tackle the uncertainty inherent in all optimization decisions.
+One particularly attractive property of this framework is its _unparalleled_
+sample efficiency, a property we will discuss more in-depth later.
 
-The goal of this notebook is to introduce you to Bayesian optimization from a
-high-level perspective as well as introduce you to the "Bayesian optimization
-workflow" and the components involved. Additional notebooks that cover these
-topics in more depth can be found within the
+In these notes, the goal is to introduce Bayesian optimization from a high-level
+perspective and introduce the components involved in the "Bayesian optimization
+workflow". Additional notes discussing the components and related topics in
+detail are available in the
 [`bayesian-optimization`](https://github.com/drewgjerstad/bayesian-optimization)
-repo. We begin with the theoretical motivation for Bayesian optimization and an
-overview of its applications.
+repository. We will begin with the motivation behind Bayesian optimization,
+primarily focusing on the theoretical motivation and examples of real-world
+Bayesian optimization applications.
 
-```{python}
-# Import Dependencies
-import numpy as np
-import scipy as sp
-import matplotlib.pyplot as plt
-```
-
+\newpage
 # Motivation
 
 ## Theoretical Motivation
-Before we explore the applications of Bayesian optimization, we must consider
-the theoretical motivation for such an approach. The theoretical motivation
-typically stems from the form or type of _objective_ (the "function" we are
-aiming to optimize). Note that the list below is not exhaustive; there are
-additional theoretical motivations but these seem to be the most common,
-particularly with respect to the form and properties of the objective.
+First, we consider the theoretical motivation for the Bayesian optimization
+approach. Typically, the theoretical motivation steps from the form or type of
+_objective_ (the "function" we are aiming to optimize). Note that the list below
+is by no means exhaustive; there exists additional theoretical motivation but
+these are seemingly the most common, particularly with regard to the form and
+characteristics of the objective.
 
  * **Black-box objective functions** are functions that we can only interact
-   with via its inputs and outputs meaning typical methods do not work. However,
-   we can usually approximate such an objective and use Bayesian optimization to
-   manage the uncertainty.
+   with via its inputs and outputs meaning classical, analytical methods do not
+   work. However, we can usually use Bayesian optimization to approximate such
+   an objective and manage the inherent uncertainty.
 
  * **Expensive-to-evaluate objective functions** are functions that require
-   significant computation effort to obtain their output. However, once again,
-   we can approximate and model these efficiently using the Bayesian approach.
+   significant computation effort to obtain their output. However, just as with
+   black-box objectives, we can use Bayesian optimization to approximate and
+   model these efficiently.
 
  * More generally, this approach is very useful when the objectives lack
    analytical evaluation (or, if analytical evaluation is expensive).
 
- * In some spaces such as discrete or combinatorial, the objectives may not have
-   efficient gradients (if they exist) and so classical gradient-based
+ * In some spaces such as the discrete or combinatorial ones, the objective may
+   not have efficient gradients (if they exist). Thus, classical gradient-based
    optimization methods are incompatible.
 
 ## Applications
 The application potential of Bayesian optimization can be seen across several
-critical domains, especially those attempting to accelerate finding solutions to
-real-world scientific and engineering problems. Some of these applications
-include:
+critical domains, especially those attempting to accelerate the identification
+of solutions to real-world scientific and engineering problems. Some of these
+applications include:
 
- * Drug Discovery
- * Molecule/Protein Discovery
- * Materials Design
+ * Drug discovery
+ * Molecule/protein discovery
+ * Materials design
  * AutoML (i.e., hyperparameter tuning)
- * Engineering Decisions
+ * Engineering decisions
  * Many more...
 
-The images and diagrams below should help you form an idea of how Bayesian
-optimization fits into some of these applications. Note that this is by no means
-an exhaustive list nor should you worry too much about some of the contextual
-details of the specific applications shown. This is merely to provide real-world
+The diagrams in the next few sections are there to illustrate how the Bayesian
+optimization approach is used in real-world applications. There will also be
+commentary explaining why the approach is so useful in these applications. Just
+as with the list above, this is not (in any way) an exhaustive review of
+applications. Rather, the point of these sections is to showcase the real-world
 motivation for this optimization approach.
 
+\newpage
 ### Application: Drug Discovery
-The image below provides an example of optimization applied to a chemical
-process problem (common in drug discovery). Don't worry about the details
-regarding the formulation of the problem itself but rather consider the fact
-that running chemical synthesis experiments require two things: _time_ and
-_money_. Therefore, scientists want to accelerate finding optimal solutions or
-in this case, optimal chemical processes/reactions.
+Figure 1 below shows an example of a chemical process optimization problem,
+common in drug discovery. Don't stress about the details regarding the
+formulation of the problem but rather consider the fact that running chemical
+synthesis experiments require both _time_ and _money_. Therefore, scientists
+want to accelerate finding optimal solutions, or in this case, optimal chemical
+processes/reactions.
 
-In the bottom right of the image, four common (classical) approaches to this
-optimization problem are shown. However, these approaches are likely expensive
-(as mentioned previously). Therefore, the alternative approach, Bayesian
-optimization, is shown in the bottom left of the image. Bayesian optimization
-can use data from previous experiments to locate points (samples) that may
-optimize the unknown objective, while accounting for uncertainty in the model.
-These points will typically then be used to plan the next experiments since they
-represent samples of high utility. In this context, high utility means the point
-could be useful in optimizing the reaction parameter.
+In the left half of the figure, four common (classical) approaches are shown
+but these approaches are expensive. Alternatively, the Bayesian optimization
+approach is shown in the right half. That approach uses data from previous
+experiments to locate points that may optimize the unknown objective, while
+strategically handling uncertainty in the model. The located points will usually
+be used to plan future experiments as they represent samples of _high utility_
+(i.e., the point should be useful in optimizing the reaction parameter).
 
 ![From _Bayesian optimization as a tool for chemical synthesis_ by
-Shields et al. (2021)](graphics/applications/drug-discovery.png){width=450}
+Shields et al. (2021)](graphics/applications/drug-discovery.png){width=500}
 
+\newpage
 ### Application: Molecule/Protein Discovery
 In the field of molecule and protein design, there are similar considerations to
-the ones in the previous application: experiments are costly. In the diagram
-below, the integration of Bayesian optimization with experimentation is shown.
-Scientists typically synthesize and test several different formulations to build
-a dataset. This dataset is used to help model the unknown objective and can be
-used to suggest new formulations. As new formulations are synthesized and
-tested, they are added to the dataset so as to inform the model and optimizer of
-formulations to suggest next.
+the ones in the previous application: experiments are costly. Figure 2 shows the
+integration of the Bayesian optimization approach with experimentation. In most
+environments, scientists synthesize and test several different formulations to
+obtain a dataset. This dataset is used to help model the underlying objective
+and can be used to suggest new, promising formulations. Then, as shown in the
+figure, the new formulations are synthesized, tested, and added to the dataset
+so as to inform the model and optimizer of formulations to suggest next.
 
 ![From _Sequential closed-loop Bayesian optimization as a guide for organic_
 _molecular metallophotocatalyst formulation discovery_ by Li et al. (2024)](
-  graphics/applications/molecule-protein-discovery.png){width=350}
+  graphics/applications/molecule-protein-discovery.png){width=300}
 
 ### Application: Materials Discovery
-The diagram below is very similar to the one for molecule/protein discovery
-except now it is demonstrating some additional specifics for materials design
-and discovery. Once again, the initial dataset is used to model the likely
-unknown objective to inform design exploration and then the results from the
-design exploration are used to augment the dataset. It appears that in this
-loop, the researchers are also using the experiments to help calibrate a
-simulation of designs, another application of Bayesian optimization.
+Figure 3 is similar to the one for molecule/protein discovery but now it is
+showcasing some additional details specific to materials design and discovery.
+Again, the initial dataset is used to model the underlying objective and inform
+design exploration, with results from design exploration being used to augment
+the dataset. Additionally, in this particular example, the researchers also use
+the experiments to assist in calibrating a simulation of designs, another
+application of Bayesian optimization.
 
 ![From _Bayesian optimization for Materials Design with Mixed Quantitative and_
 _Qualitative Variables_ by Zhang et al. (2020)](
-  graphics/applications/materials-design.jpg)
+  graphics/applications/materials-design.jpg){width=400}
 
+\newpage
 ### Application: AutoML
-The diagram below is very similar to the one for molecule/protein discovery
-except now it is demonstrating some additional specifics for materials design
-and discovery. Once again, the initial dataset is used to model the likely
-unknown objective to inform design exploration and then the results from the
-design exploration are used to augment the dataset. It appears that in this
-loop, the researchers are also using the experiments to help calibrate a
-simulation of designs, another application of Bayesian optimization.
+Figure 4 shows a workflow to tune neural network hyperparameters using Bayesian
+optimization, specifically using a Gaussian process as a surrogate model. AutoML
+is the process of automating the machine learning workflow and typically
+includes tuning models' hyperparameters. We can use Bayesian optimization to
+perform this tuning in a more efficient manner by identifying the next set of
+promising hyperparameters based on the current model and its uncertainty.
 
 ![From _Achieve Bayesian optimization for tuning hyperparameters_ by Edward
-Ortiz on _Medium_ (2020)](graphics/applications/automl.png){width=500}
+Ortiz on _Medium_ (2020)](graphics/applications/automl.png){width=300}
 
 ### Application: Engineering Decisions
-The diagram below is very similar to the one for molecule/protein discovery
-except now it is demonstrating some additional specifics for materials design
-and discovery. Once again, the initial dataset is used to model the likely
-unknown objective to inform design exploration and then the results from the
-design exploration are used to augment the dataset. It appears that in this
-loop, the researchers are also using the experiments to help calibrate a
-simulation of designs, another application of Bayesian optimization.
+Figure 5 shows how Bayesian optimization can be used to calibrate a particle
+accelerator in a similar manner to the previous applications. The "operator"
+inputs the target beam parameters while a camera inputs the observed beam
+parameters. Then, Bayesian optimization determines the changes (i.e., the next
+set of beam parameters) to ideally improve the calibration of the particle
+accelerator.
 
 ![From _Reinforcement learning-trained optimizers and Bayesian optimization for_
 _online particle accelerator tuning_ by Kaiser et al. (2024)](
-  graphics/applications/engineering-decisions.png){width=500}
+  graphics/applications/engineering-decisions.png){width=315}
 
+\newpage
 # Optimization Foundations
 In this section, we will examine the foundations of optimization to understand
 the ideas and methods that Bayesian optimization builds on. This will include
