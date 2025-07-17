@@ -432,119 +432,117 @@ Bayesian statistics, the reader is referred to _Mathematical Statistics and_
 _Data Analysis_ by John A. Rice or _Bayesian Optimization_ by Roman Garnett
 (which provides an optimization-focused review).
 
-In Bayesian optimization, we use Bayesian statistics to reason in a systematic
-and quantitative manner about the uncertainty in the observation (surrogate)
-model using probabilities.
+## Bayesian Statistics
+**Bayesian statistics** provide us with a systematic and quantitative approach
+to reason about uncertainty using probabilities. Thus, in _Bayesian_
+optimization, we use _Bayesian_ statistics to reason about uncertainty in the
+observation (or surrogate) model.
 
-One of the core ideas in Bayesian statistics is **Bayesian inference**. Bayesian
-inference uses Bayes' Theorem to reason about how the prior distribution
-$p(\theta)$, the likelihood $p(\text{data}\vert\theta)$, and the posterior
-distribution $p(\theta\vert\text{data})$ interact with each other (where
-$\theta$ represents the parameter of interest). Bayes' Theorem is given below:
+One of the central concepts in Bayesian statistics is **Bayesian inference**.
+Bayesian inference uses Bayes' theorem to reason about how the prior
+distribution $p(\theta)$, the likelihood $p(\text{data}\vert\theta)$, and the
+posterior distribution $p(\theta\vert\text{data})$ interact with each other.
+Note that $\theta$ represents the parameter of interest.
 
+Recall **Bayes' theorem**:
 \begin{equation*}
     p(\theta\vert\text{data}) = \frac{p(\text{data}\vert\theta)p(\theta)}
         {p(\text{data})}
 \end{equation*}
 
-Let's back up a bit and break this down. First, in simpler terms, Bayesian
-inference is a framework used to infer uncertain features (variables) of a
-particular system of interest from observations using the laws of probability.
+Let's take a step back and break this down. First, Bayesian inference is a
+framework that allows us to infer uncertain features of a system of interest
+from observations using the laws of probability. Thus, within this framework,
+all unknown quantities are denoted by _random variables_. This is convenient as
+we can express our beliefs using probability distributions reflecting plausible
+values.
 
-Within Bayesian inference framework, all unknown quantities are considered to
-be _random variables_. This enables us to represent our beliefs with probability
-distributions that reflect plausible values. We begin first with a **prior**
-**distribution**, $p(\theta)$ that represents our beliefs before seeing any
-data. For instance, if we believe that the data is normally distributed then we
-would define the prior distribution to be the Gaussian normal distribution with
-mean $\mu$ and standard deviation $\sigma$.
+The **prior distribution**, $p(\theta)$, represents our beliefs before we
+observe any data. For instance, if we believe that the data is normally
+distributed then we would likely define the prior distribution to be the
+Gaussian normal distribution with mean $\mu$ and standard deviation $\sigma$.
 
-Next, we are able to refine our initial beliefs after we have observed some data
-using the **likelihood** $p(\text{data}\vert\theta)$. The likelihood, or
-likelihood function, provides the distribution of observed values ($y$) given
-the location $(x)$ and values of interest ($\theta$).
+Then, we can refine our initial beliefs once we have observed some data using
+the **likelihood function**, $p(\text{data}\vert\theta)$. The likelihood
+function, or likelihood, provides the distribution of observed values ($y$)
+given the location ($x$), and values of interest ($\theta$).
 
-Using the observed value $y$, we can derive the **posterior distribution** of
-$\theta$ using Bayes' theorem, as defined previously.
-
-\begin{equation*}
-    p(\theta\vert x, y) = \frac{p(\theta)p(y\vert x, \theta)}{p(y\vert x)}
-\end{equation*}
-
-This so-called posterior distribution represents a "compromise" between our
-beliefs or experience from the prior and our observations from the likelihood.
-The posterior distribution is at the heart of Bayesian optimization since we use
-it to update the surrogate model as we acquire new observations.
+Finally, using the observed value $y$, we can derive the **posterior**
+**distribution**, $p(\theta\vert\text{data})$, using Bayes' theorem (defined
+above) where $\text{data} = (x, y)$. This so-called posterior distribution acts
+as a "compromise" between our initial beliefs from the prior and our
+observations from the likelihood. It is at the heart of Bayesian optimization
+and is used to update the surrogate model as we acquire additional observations.
 
 ## Bayesian Inference of the Objective Function
-The primary use of Bayesian inference in Bayesian optimization is with respect
-to the objective function, the source of uncertainty. The probabilistic belief
-we use over the objective function is called a _stochastic process_.
+The primary use of Bayesian inference in Bayesian optimization is to reason
+about the uncertainty in the objective function. Specifically, the probabilistic
+belief we use over the objective function is called a _stochastic process_. A
+**stochastic process** is a probability distribution over an infinite collection
+of random variables, for example, the objective function value at each point in
+the domain.
 
-A **stochastic process** is a probability distribution over an infinite
-collection of random variables, for example, the objective function value at
-every point in the domain.
-
-We will express any assumptions that we may have about the objective function
-in a **prior process** $p(\mathcal{f})$. Then, a stochastic process can be
-defined via the distribution of the function values $\boldsymbol{\phi}$ given a
-finite set of points $\boldsymbol{x}$:
+We will use a **prior process**, $p(f)$, to express our assumptions (beliefs)
+that we may have about the objective function. Then, we can define a stochastic
+process using the distribution of the function values $\boldsymbol{\phi}$ given
+a finite set of points $\boldsymbol{x}$:
 
 \begin{equation*}
     p(\boldsymbol{\phi}\vert\boldsymbol{x})
 \end{equation*}
 
-In Bayesian optimization, the gold standard stochastic process is the
-**Gaussian process** since many of these finite-dimensional distributions are
-multivariate Gaussian (or approximately so).
+The "gold standard" stochastic process used in Bayesian optimization is the
+**Gaussian process** due to its expressivity and flexibility, in addition to the
+fact that many of these finite-dimensional distributions are multivariate
+Gaussian (or approximately so).
 
-Returning to the discussion of Bayesian inference over the objective, suppose we
-make a set of observations at locations $\boldsymbol{x}$ with corresponding
-vaulues $\boldsymbol{y}$. Let $\mathcal{D} = (\boldsymbol{x},\boldsymbol{y})$ be
-the dataset of aggregated observations.
-
-Bayesian inference will account for these observations via the formation of the
-**posterior process** (akin to the posterior predictive distribution):
+Let's now return to discussing how Bayesian inference is applied over the
+objective. Suppose we make a set of observations at locations $\boldsymbol{x}$
+with corresponding values $\boldsymbol{y}$. Let
+$\mathcal{D} = (\boldsymbol{x}, \boldsymbol{y})$ be the dataset of aggregated
+observations. Bayesian inference will account for these observations via the
+formation of the **posterior process**, akin to the posterior predictive
+distribution:
 
 \begin{equation*}
-    p(\mathcal{f}\vert\mathcal{D}) =
-    \int p(\mathcal{f}\vert\boldsymbol{x},\boldsymbol{\phi})
+    p(f\vert\mathcal{D}) = \int p(f\vert\boldsymbol{x},\boldsymbol{\phi})
     p(\boldsymbol{\phi}\vert\mathcal{D})\hspace{2pt}\text{d}\boldsymbol{\phi}
 \end{equation*}
 
+\newpage
 # The Bayesian Approach
-The notion of the "Bayesian approach" (particularly in the context of
-optimization) refers to a philosophical approach derived from Bayesian
-inference. The Bayesian approach allows us to tackle uncertainty inherent in
-optimization decisions, a crucial property since decisions will determine our
-success. To do this, it systematically relies on probability laws and Bayesian
-inference to reason about uncertainty during optimization.
+The "Bayesian approach", particularly in the context of optimization, refers to
+a philosophical approach that uses Bayesian inference to reason about
+uncertainty. Specifically, the Bayesian approach enables us to tackle the
+inherent uncertainty in optimization decisions which is crucial since our
+decisions will determine our success. This is accomplished through a systematic
+reliance on probability laws and Bayesian inference during optimization.
 
-For instance, as briefly discussed in the previous section, the objective
-function is regarded as a random variable that is to be informed by our prior
-expectations and prior observations. This approach will play an active role in
-the optimization as it will guide the optimization policy, specifically by
-evaluating the merit of a candidate observation. Furthermore, it leads to the
-development of **uncertainty-aware optimization policies**.
+Recall that the objective function is viewed as a random variable that will be
+informed by our prior expectations and posterior observations. The Bayesian
+approach will play an active role in the optimization process to guide the
+optimization policy by evaluating the merit of a candidate observation. This
+results in **uncertainty-aware optimization policies**.
 
 ## Uncertainty-Aware Optimization Policies
-Recall that the optimization policy determines the decisions, or actions, taken
-during the optimization process. In order to handle the uncertainty of the
-(potentially unknown or black-box) objective function, the policy should examine
-the available data (i.e., pre-existing observations and corresponding values) to
-determine the each successive observation location optimally. The only
-requirement from ourselves is to establish our preferences for what data or what
-kind of data we want to acquire and then maximize such preferences.
+The optimization policy determines the decisions made during the optimization
+process. To reasonably handle the uncertainty of the objective function, the
+policy should use the available data to determine the successive observation
+locations optimally. There is only one requirement from ourselves: we need to
+establish our preferences for what data or what "kind" of data we want to
+acquire. Then, we design the policy to maximize such preferences.
 
 Clearly, this will require some sort of framework to make decisions in this way,
 especially in the face of uncertainty. A natural choice is **Bayesian decision**
-**theory** which will be discussed in more detail in another notebook.
+**theory** which will be discussed in more detail in another set of notes (see
+the _Additional Notes_ section).
 
 As we continue to explore Bayesian optimization and uncertainty-aware policies,
 a common theme will begin to emerge: all Bayesian optimization policies handle
 the uncertainty in the objective function in a uniform manner, a property that
 is defined implicitly within an optimal _acquisition function_.
 
+\newpage
 # Bayesian Optimization Workflow
 The Bayesian optimization workflow is composed of two main _primitives_: the
 surrogate model for expressing our beliefs and knowledge about the objective
@@ -604,6 +602,7 @@ distance between the current and optimal locations whereas cumulative regret
 measures the cumulative distance between historical locations and the optimum
 location.
 
+\newpage
 # References
 For full-reference details, the BibTeX entries can be found in the
 `bibliography.bib` file.
