@@ -113,24 +113,18 @@ motivation for this optimization approach.
 \newpage
 ### Application: Drug Discovery
 Figure 1 below shows an example of a chemical process optimization problem,
-common in drug discovery. Don't stress about the details regarding the
-formulation of the problem but rather consider the fact that running chemical
-synthesis experiments require both _time_ and _money_. Therefore, scientists
-want to accelerate finding optimal solutions, or in this case, optimal chemical
-processes/reactions.
-
-In the left half of the figure, four common (classical) approaches are shown
-but these approaches are expensive. Alternatively, the Bayesian optimization
-approach is shown in the right half. That approach uses data from previous
-experiments to locate points that may optimize the unknown objective, while
-strategically handling uncertainty in the model. The located points will usually
-be used to plan future experiments as they represent samples of _high utility_
-(i.e., the point should be useful in optimizing the reaction parameter).
+common in drug discovery. In the left half of the figure, four common
+(classical) approaches are shown but these approaches are expensive.
+Alternatively, the Bayesian optimization approach is shown in the right half.
+That approach uses data from previous experiments to locate points that may
+optimize the unknown objective, while strategically handling uncertainty in the
+model. The located points will usually be used to plan future experiments as
+they represent samples of _high utility_ (i.e., the point should be useful in
+optimizing the reaction parameter).
 
 ![From _Bayesian optimization as a tool for chemical synthesis_ by
-Shields et al. (2021)](graphics/applications/drug-discovery.png){width=500}
+Shields et al. (2021)](graphics/applications/drug-discovery.png){width=350}
 
-\newpage
 ### Application: Molecule/Protein Discovery
 In the field of molecule and protein design, there are similar considerations to
 the ones in the previous application: experiments are costly. Figure 2 shows the
@@ -145,6 +139,7 @@ so as to inform the model and optimizer of formulations to suggest next.
 _molecular metallophotocatalyst formulation discovery_ by Li et al. (2024)](
   graphics/applications/molecule-protein-discovery.png){width=300}
 
+\newpage
 ### Application: Materials Discovery
 Figure 3 is similar to the one for molecule/protein discovery but now it is
 showcasing some additional details specific to materials design and discovery.
@@ -156,9 +151,8 @@ application of Bayesian optimization.
 
 ![From _Bayesian optimization for Materials Design with Mixed Quantitative and_
 _Qualitative Variables_ by Zhang et al. (2020)](
-  graphics/applications/materials-design.jpg){width=400}
+  graphics/applications/materials-design.jpg){width=425}
 
-\newpage
 ### Application: AutoML
 Figure 4 shows a workflow to tune neural network hyperparameters using Bayesian
 optimization, specifically using a Gaussian process as a surrogate model. AutoML
@@ -168,8 +162,9 @@ perform this tuning in a more efficient manner by identifying the next set of
 promising hyperparameters based on the current model and its uncertainty.
 
 ![From _Achieve Bayesian optimization for tuning hyperparameters_ by Edward
-Ortiz on _Medium_ (2020)](graphics/applications/automl.png){width=300}
+Ortiz on _Medium_ (2020)](graphics/applications/automl.png){width=325}
 
+\newpage
 ### Application: Engineering Decisions
 Figure 5 shows how Bayesian optimization can be used to calibrate a particle
 accelerator in a similar manner to the previous applications. The "operator"
@@ -180,20 +175,16 @@ accelerator.
 
 ![From _Reinforcement learning-trained optimizers and Bayesian optimization for_
 _online particle accelerator tuning_ by Kaiser et al. (2024)](
-  graphics/applications/engineering-decisions.png){width=315}
+  graphics/applications/engineering-decisions.png){width=450}
 
 \newpage
 # Optimization Foundations
-In this section, we will examine the foundations of optimization to understand
-the ideas and methods that Bayesian optimization builds on. This will include
-formalizing optimization, objective functions, observation models, some common
-optimization policies, termination policies, and a diagram of the optimization
-process. For a more thorough examination of optimization, see Nocedal and
-Wright's _Numerical Optimization_ (Springer Series in Operations Research).
-
 **Optimization** is a process and field of study that aims to efficiently locate
 the optimal objective value and/or its location from the search domain and its
-corresponding objective values.
+corresponding objective values. In this section, we will introduce the
+foundations of optimization to understand the ideas that Bayesian optimization
+builds on. For a more thorough review of optimization, see Nocedal and Wright's
+_Numerical Optimization_ book (in the Springer Series in Operations Research).
 
 ## Formalization of Optimization
 Let's first formalize a typical optimization problem. This formulation is a
@@ -206,6 +197,7 @@ there exists other "types" of optimization other than just continuous.
     \hspace{36pt}
     f^* = \max_{x \in \mathcal{X}} f(x) = f(x^*)
 \end{equation*}
+
 where $f:\mathcal{X}\rightarrow\mathbb{R}$ is a real-valued _objective function_
 on some domain $\mathcal{X}$, $x^*$ is the point that obtains the global maximum
 value $f^*$. Note that the $\max$ versus $\min$ is arbitrary and depends on the
@@ -215,16 +207,16 @@ _Black-box optimization_ arises from the fact that we do not need to have an
 explicit objective function $f$ but rather only some information about the
 objective at identified points.
 
-The code below creates a plot showing a objective function and points showing
-the _optima_. Optima are the points that either maximize or minimize (optimize)
-the objective function.
-
+The plot below shows an objective function with its _optima_ labeled. **Optima**
+are the points that either maximize or minimize (optimize) the objective
+function. The objective function plotted below is given by
 \begin{equation*}
     f(x) = 10\sin(0.2x)\cos(0.1x) + \sin(0.5x) + 0.05x
 \end{equation*}
 
 ```{python}
-# Plot Objective Function with Optima Labeled
+#| label: objective-with-optima
+#| echo: false
 
 def objective(x:np.array)->np.array:
     return (np.sin(0.2 * x) * np.cos(0.1 * x) * 10 +
@@ -233,25 +225,32 @@ def objective(x:np.array)->np.array:
 x = np.linspace(0, 50, 1000)
 y = objective(x)
 
-plt.figure(figsize=(8, 4))
+plt.figure(figsize=(8, 2))
 plt.plot(x, y, label="Objective Function", c="gray", linestyle="--")
 plt.scatter(x[np.argmax(y)], np.max(y), label="Global Max", c="r")
 plt.scatter(x[np.argmin(y)], np.min(y), label="Global Min", c="r", marker="D")
 plt.scatter(x[np.argmax(y[:200])], np.max(y[:200]), label="Local Max",
-            c="g", marker="o")
+            c="k", marker="o")
 plt.scatter(x[np.argmax(y[800:]) + 800], np.max(y[800:]), label="Local Max",
-            c="g", marker="o")
+            c="k", marker="o")
 plt.scatter(x[np.argmin(y[200:400]) + 200], np.min(y[200:400]),
-            label="Local Min", c="b", marker="D")
+            label="Local Min", c="k", marker="D")
+plt.xlim((0, 75))
+plt.title("Objective Function with Optima Labeled")
+plt.xlabel("Observation")
+plt.ylabel("Objective Value")
 plt.legend()
 plt.show()
 ```
 
-It must be emphasized that the use of NumPy's functions for finding the
-argument (location) and value for each minimum/maximum is purely for
-the purposes of visualization. In optimization, we would typically want to avoid 
-computing the objective function at each location in the space but rather use
-methods to find the optima in a more efficient manner.
+In the plot on the previous page, the optima were found by obtaining the values of the
+objective at every point in the _domain_. However, in optimization, we typically
+want to avoid such computations due to its expensiveness and rather use methods
+to find the optima in a more efficient manner. Furthermore, in the event we are
+dealing with _black-box optimization_, recall that we don't necessarily have an
+explicit objective but rather inputs and their corresponding outputs. That means
+that evaluating the objective function at each point in the domain is not only
+inefficient but effectively impossible.
 
 ## Objective Functions
 The **objective function** is the function that we want to optimize. For some
@@ -266,7 +265,8 @@ or a flat region with many saddle points. The plot below shows these three
 general types of objectives.
 
 ```{python}
-# Plot General Types of Objective Functions
+#| label: objective-fcn-types
+#| echo: false
 
 def objective_convex(x:np.array)->np.array:
     return 0.1*(x - 5)**2
@@ -279,13 +279,16 @@ def objective_non_convex_saddle(x:np.array)->np.array:
 
 x = np.linspace(0, 10, 1000)
 
-fig, ax = plt.subplots(nrows=1, ncols=3, figsize=(10, 4))
+fig, ax = plt.subplots(nrows=1, ncols=3, figsize=(16, 4))
 ax[0].plot(x, objective_convex(x))
 ax[0].set_title("Convex with\n Unique Optima")
 ax[1].plot(x, objective_non_convex(x))
 ax[1].set_title("Non-Convex with\nSeveral Optima")
 ax[2].plot(x, objective_non_convex_saddle(x))
 ax[2].set_title("Non-Convex with\nSaddle Points")
+for i in range(len(ax)):
+    ax[i].set_xlabel("Observation")
+    ax[i].set_ylabel("Objective Value")
 plt.show()
 ```
 
@@ -294,24 +297,25 @@ efficiently optimize such functions, there are other characteristics (listed
 below) of objective functions common in Bayesian optimization that also lead to
 issues.
 
- * The objective is considered to be a ``black-box`` function meaning we can
+ * The objective is considered to be a _black-box_ function meaning we can
    only interact with the objective via its inputs and outputs.
 
- * The objective's returned value is corrupted by some sort of noise and does
+ * The objective's returned value is _corrupted_ by some sort of noise and does
    not represent the exact true objective value at that location.
 
- * The cost of evaluating the objective function is high and requires a
-   sample efficient method to avoid expensive probing.
+ * The objective has a _high cost_ of evaluation and requires a sample efficient
+   method to avoid expensive probing.
 
- * There do not exist gradients (if we did, efficient gradient-based methods
+ * There _do not exist gradients_ (if we did, efficient gradient-based methods
    could be employed to locate and evaluate optima).
 
 ## Observation Models
 Observation models are similar to the idea of surrogate models used in the
-Bayesian optimization workflow but there are some key differences. The observation is used to describe how the true objective is _observed_, usually
-accounting for some form of noise. On the other hand, the surrogate model is
-a probabilistic model (i.e., Gaussian process) used to approximate the unknown
-objective function.
+Bayesian optimization workflow but there are some key differences. The
+observation model is used to describe how the true objective is _observed_,
+usually accounting for some form of (additive) noise. On the other hand, the
+surrogate model is a probabilistic model (i.e., Gaussian process) used to
+approximate the unknown objective function.
 
 Specifically, the **observation model** is an approach to formalize the
 relationship between the true objective function, the actual observation, and
@@ -344,7 +348,8 @@ variance $\sigma^2$. This leads to the distribution of $y$ being centered around
 the true objective value at sample location $x$, $f(x)$.
 
 ```{python}
-# Plot Example Observation Model
+#| label: observation-model-example
+#| echo: false
 
 def true_objective(x:np.array)->np.array:
     return np.sin(0.75 * x)
@@ -355,10 +360,12 @@ def observation(x:np.array, sd:float)->np.array:
 x = np.linspace(0, 10, 1000)
 samples = np.linspace(0, 10, 100)
 
-plt.figure(figsize=(8, 4))
+plt.figure(figsize=(16, 3))
 plt.plot(x, true_objective(x), label="True Objective", c="b")
 plt.scatter(samples, observation(samples, sd=0.5), label="Observations", c="k")
 plt.title("Observation Model Example")
+plt.xlabel("Observation")
+plt.ylabel("Objective Value")
 plt.legend()
 plt.show()
 ```
@@ -376,7 +383,7 @@ between the "inner-workings" of the policy and the environment, with the
 environment typically being _noise-corrupted_ (hence the need for an observation
 model).
 
-More definitive, a **policy** is a mapping function that takes in a new input
+More definitively, a **policy** is a mapping function that takes in a new input
 observation plus any existing observations and uses a _principled_ sampling
 approach to output the next observation location. It will also decide if it
 should perform another iteration (select a new observation) or terminate the
@@ -417,6 +424,7 @@ depends heavily on the approach or method and the problem/application.
 ![General Optimization Process Diagram](
   graphics/opt-foundations/process-diagram.png)
 
+\newpage
 # Bayesian Foundations
 Before we venture into the world of Bayesian optimization, we must first review
 some foundations of Bayesian statistics. For a more comprehensive examination of
