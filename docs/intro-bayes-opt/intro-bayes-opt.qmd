@@ -43,9 +43,24 @@ perspective and introduce the components involved in the "Bayesian optimization
 workflow". Additional notes discussing the components and related topics in
 detail are available in the
 [`bayesian-optimization`](https://github.com/drewgjerstad/bayesian-optimization)
-repository. We will begin with the motivation behind Bayesian optimization,
-primarily focusing on the theoretical motivation and examples of real-world
-Bayesian optimization applications.
+repository and are linked below. We will begin with the motivation behind
+Bayesian optimization, primarily focusing on the theoretical motivation and
+examples of real-world Bayesian optimization applications.
+
+
+## Additional Notes
+The links below lead to other notes in the `bayesian-optimization` repo,
+discussing the components in and topics related to Bayesian optimization.
+
+* [**Bayesian Decision Theory**](https://github.com/drewgjerstad/bayesian-optimization/blob/main/docs/bayes-decision-theory/bayes-decision-theory.pdf)
+* [**Gaussian Processes**](https://github.com/drewgjerstad/bayesian-optimization/blob/main/docs/gaussian-processes/gaussian-processes.pdf)
+* [**Covariance Functions and Kernels**](https://github.com/drewgjerstad/bayesian-optimization/blob/main/docs/covariance-kernels/covariance-kernels.pdf)
+* [**Model Evaluation and Selection**](https://github.com/drewgjerstad/bayesian-optimization/blob/main/docs/model-evaluation/model-evaluation.pdf)
+* [**Utility Functions**](https://github.com/drewgjerstad/bayesian-optimization/blob/main/docs/utility-functions/utility-functions.pdf)
+* [**Acquisition Functions**](https://github.com/drewgjerstad/bayesian-optimization/blob/main/docs/acquisition-functions/acquisition-functions.pdf)
+* [**Computing Acquisition Functions**](https://github.com/drewgjerstad/bayesian-optimization/blob/main/docs/computing-acq-functions/computing-acq-functions.pdf)
+* [**GP Regression**](https://github.com/drewgjerstad/bayesian-optimization/blob/main/docs/gp-regression/gp-regression.pdf)
+* [**GP Classification**](https://github.com/drewgjerstad/bayesian-optimization/blob/main/docs/gp-classification/gp-classification.pdf)
 
 \newpage
 # Motivation
