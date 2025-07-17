@@ -11,26 +11,24 @@ optimization.
 > let me know.
 
 ## 📁 `docs`
-This directory contains notebooks consisting of notes and tutorials for Bayesian
-optimization and related topics.
+This directory contains notes/tutorials on Bayesian optimization and related
+topics.
 
-* [**Introduction to Bayesian Optimization**](
-   docs/01-introduction/01-introduction.pdf)
-* **Gaussian Processes**
-* **Covariance Functions (Kernels)**
-* [**Bayesian Decision Theory**](docs/04-decision-theory/04-decision-theory.pdf)
-* [**Utility Functions**](docs/05-utility-functions/05-utility-functions.pdf)
-* **Acquisition Functions**
-* **Implementation**
-* **Theoretical Analysis**
-* **GP Regression**
-* **GP Classification**
+* [**Introduction to Bayesian Optimization**](docs/intro-bayes-opt/intro-bayes-opt.pdf)
+* [**Bayesian Decision Theory**](docs/bayes-decision-theory/bayes-decision-theory.pdf)
+* [**Gaussian Processes**](docs/gaussian-processes/gaussian-processes.pdf)
+* [**Covariance Functions and Kernels**](docs/covariance-kernels/covariance-kernels.pdf)
+* [**Model Evaluation and Selection**](docs/model-evaluation/model-evaluation.pdf)
+* [**Utility Functions**](docs/utility-functions/utility-functions.pdf)
+* [**Acquisition Functions**](docs/acquisition-functions/acquisition-functions.pdf)
+* [**Computing Acquisition Functions**](docs/computing-acq-functions/computing-acq-functions.pdf)
+* [**GP Regression**](docs/gp-regression/gp-regression.pdf)
+* [**GP Classification**](docs/gp-classification/gp-classification.pdf)
 
 
 ## 📁 `examples`
 This directory contains notebooks exploring various examples of Bayesian
 optimization and its applications.
- * **Bayesian Statistics**
  * [**Introduction to GPyTorch and GAUCHE**](examples/gpytorch_and_gauche.ipynb)  
     _This notebook synthesizes information from GPyTorch and GAUCHE's_
     _documentation regarding Gaussian processes for machine learning and how to_
@@ -54,22 +52,22 @@ optimization and related topics. The BibTeX entries can be found in the
 
 <!---
 Topics
- - Introduction to Bayesian optimization
+ - Introduction to Bayesian Optimization
     - Garnett Chapter 1, Liu Chapter 1, R+W Chapter 1, Shahriari Paper
+ - Bayesian Decision Theory
+    - Garnett Chapter 5, Liu Chapter 3, Garnett 9.3
  - Gaussian Processes
-    - Garnett Chapter 2/3, Liu Chapter 2, R+W Appendix B
- - Covariance Functions
+    - Garnett Chapter 2/3, Liu Chapter 2, R+W Appendix B, Garnett 9.1
+ - Covariance Functions and Kernels
     - R+W Chapter 4
- - Decision Theory
-    - Garnett Chapter 5, Liu Chapter 3
+ - Model Evaluation and Selection
+    - Garnett Chapter 4
  - Utility Functions
     - Garnett Chapter 6
  - Acquisition Functions
-    - Garnett Chapter 7/8
- - Implementation
-    - Garnett Chapter 9
- - Theoretical Analysis
-    - Garnett Chapter 10
+    - Garnett Chapter 7
+ - Computing Acquisition Functions
+    - Garnett Chapter 8, Garnett 9.2
  - GP Regression
     - R+W Chapter 2
  - GP Classification
