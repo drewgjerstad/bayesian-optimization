@@ -19,6 +19,10 @@ format:
                \DeclareMathOperator*{\argmax}{\text{arg}\max}
                \DeclareMathOperator*{\argmin}{\text{arg}\min}
 jupyter: conda-env-main-env-py
+bibliography: intro-bayes-opt.bib
+csl: /Users/drewgjerstad/repos/bayesian-optimization/acm.csl
+nocite: |
+  @*
 ---
 
 ```{python}
@@ -544,69 +548,51 @@ is defined implicitly within an optimal _acquisition function_.
 
 \newpage
 # Bayesian Optimization Workflow
-The Bayesian optimization workflow is composed of two main _primitives_: the
-surrogate model for expressing our beliefs and knowledge about the objective
-function, and the acquisition function that will guide the optimization policy
-to make optimal decisions about where to observe next. In this section, we will
-briefly discuss these two primitives to understand how they fit into this
-workflow. Note that these topics will be discussed more thoroughly in other
-notebooks.
+The Bayesian optimization workflow consists of two main _primitives_: the
+surrogate model and the acquisition function. In this section, we will briefly
+discuss these two primitives to understand how they fit into this workflow. Note
+that these topics will be discussed in-depth in other notes (see the
+_Additional Notes_ section).
 
 ## Surrogate Models
-**Surrogate models** are the models that we use to express our beliefs and
-knowledge about the objective function. While in some literature the term
-_observation model_ is used interchangeably with _surrogate model_, they are
-distinguishable. In most applications, if we know some sort of mathematical
-formulation of the true objective then we refer to the model that relates the
-observations and the true objective as an _observation model_. However, if we
-do not know the underlying structure (as is the case with black-box functions),
-we refer to the model as a _surrogate model_ since it "takes the place of" and
-acts "as a surrogate of" the true underlying objective function.
-
-The specific use of the surrogate model is usually when we use the predictive
-posterior distribution (posterior process) to quantify the probabilities of
-observations usually in conjunction with utility functions. Therefore, the
-surrogate model is a powerful tool when we are reasoning about both the
+**Surrogate models** are the models we use in Bayesian optimization to express
+our beliefs and knowledge about the objective function. While in certain
+literature the term _observation model_ is used interchangeably with _surrogate_
+_model_, they are distinguishable. For instance, if we have a mathematical
+formulation of the objective then we refer to the model that relates the
+observations and the objective as an _observation model_. However, if we do
+not know the underlying structure of the objective then we refer to the model as
+a _surrogate model_ since it acts as a surrogate and "takes the place" of the
+objective function. The surrogate model is used within the posterior process to
+quantify the probabilities of observations in conjunction with utility
+functions. Therefore, it is a powerful tool when we are reasoning about both the
 uncertainty and utility of candidate observations.
 
-Recall that the probability distributions of an infinite collection of random
-variables are jointly used as a _stochastic process_ that is used to
-characterize the true objective function. In Bayesian optimization, a common
-choice for the surrogate model in the family of stochastic processes is the
-**Gaussian process**. It is very common due to its flexibility, expressivity,
-and sufficient uncertainty quantification properties. For Gaussian processes
-specifically, the uncertainty is quantified via the credible interval but we
-will discuss such processes in more detail later.
+As mentioned before, we use a _stochastic process_ to characterize the objective
+function and the gold standard in Bayesian optimization is the _Gaussian_
+_process_. In fact, one of the most common choices for surrogate models is the
+Gaussian process due to its flexibility, expressivity, and sufficient
+uncertainty quantification properties. We will discuss Gaussian processes in
+greater detail in other notes (see _Additional Notes_ section).
 
 ## Acquisition Functions
-**Acquisition functions** assign a score to candidate observations with the
-score representing the potential benefit the observation will add to the
-optimization process. Ideally, acquisition functions are cheap to evaluate and
-should address the _exploitation-exploration tradeoff_. Within this tradeoff,
-exploitation refers to sampling where the objective function value is expected
-to be large while exploration refers to sampling where we are more uncertain
-about the value of the objective function. Another important property of an
-acquisition function is that it will vanish at pre-existing observations where
-the objective function value is already known (no sense in sampling twice).
+**Acquisition functions** assign a score to candidate observations where the
+score represents an observation's potential benefit during optimization.
+Ideally, acquisition functions are cheap to evaluate and address the
+_exploitation-exploration tradeoff_. In the context of optimization,
+_exploitation_ refers to sampling where the objective value is expected to be
+large whereas _exploration_ refers to sampling where we are more uncertain
+about the objective value. Another useful property of an acquisition function is
+it vanishes at pre-existing observations as there is no sense in sampling twice.
 
-The optimization policy should be designed to maximize the acquisition function
-such that we select the candidate observation with the most potential to benefit
-the optimization process. There are two general cases of acquisition function:
-myopic and look-ahead. Myopic acquisition functions only consider the immediate
-utility while look-ahead acquisition functions will consider longer-term utility
-(see the notebook on decision theory for more information).
-
-Finally, the policy that uses a particular acquisition function can be
-evaluated using **instant (simple) regret**. Instant regret measures the
-distance between the current and optimal locations whereas cumulative regret
-measures the cumulative distance between historical locations and the optimum
-location.
+There are two main types of acquisition functions: myopic and look-ahead. Myopic
+acquisition functions consider only the immediate utility while look-ahead
+acquisition functions consider longer-term utility. This will be discussed
+further in the notes covering Bayesian decision theory. Regardless of the type,
+the optimization policy should be designed to maximize the acquisition function
+such that the candidate observation with the most potential benefit is selected.
 
 \newpage
 # References
-For full-reference details, the BibTeX entries can be found in the
-`bibliography.bib` file.
-
- * _Bayesian Optimization_ by Roman Garnett (2023)
- * _Bayesian Optimization: Theory and Practice Using Python_ by Peng Liu (2023)
- * _Gaussian Processes for Machine Learning_ by Rasmussen & Williams (2019)
+::: {#refs}
+:::
