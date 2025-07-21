@@ -18,6 +18,10 @@ format:
                \DeclareMathOperator*{\argmax}{\text{arg}\max}
                \DeclareMathOperator*{\argmin}{\text{arg}\min}
 jupyter: conda-env-main-env-py
+bibliography: utility-functions.bib
+csl: /Users/drewgjerstad/repos/bayesian-optimization/acm.csl
+nocite: |
+  @*
 ---
 
 ```{python}
@@ -379,7 +383,7 @@ functions frequently used in Bayesian optimization.
 
 ## Simple Reward
 The **simple reward** is named as such since it assumes that we are risk-neutral
-and that we limit the action space to only points visited during optimization.
+and thus limit the action space to only points visited during optimization.
 Suppose an optimization process returned dataset
 $\mathcal{D}(\mathbf{x}, \mathbf{y})$ to guide the final recommendation
 made using the risk-neutral utility function $v(\phi) = \phi$. Then, the
@@ -400,7 +404,7 @@ def objective(x:np.array)->np.array:
 x = np.linspace(0, 50, 1000)
 x_obs = x[np.random.randint(0, x.shape[0], 25)]
 simple_rwd_idx = np.argmax(objective(x_obs))
-plt.figure(figsize=(10, 3))
+plt.figure(figsize=(10, 4))
 plt.plot(x, objective(x), c="k", label="Posterior Mean Function")
 plt.vlines(x_obs[simple_rwd_idx], ymin=0, ymax=objective(x_obs[simple_rwd_idx]),
            colors="b", linestyles="--", label="Simple Reward")
@@ -411,12 +415,11 @@ plt.legend()
 plt.show()
 ```
 
-Garnett points out one _technical caveat_: if the returned dataset is empty,
-then the maximum degenerates and will have that $u(\emptyset) = -\infty$.
-Additionally, in the special case where we have exact observations (i.e.,
-$\mathbf{y} = f(\mathbf{x}) = \boldsymbol{\phi}$), the simple
-reward will reduce to the maximal objective value seen during the optimization
-routine:
+There is one technical caveat that Garnett points out: if the returned dataset
+is empty, then the maximum degenerates and results in $u(\emptyset) = -\infty$.
+Furthermore, in the special case where we have exact observations (i.e.,
+$\mathbf{y} = f(\mathbf{x}) = \boldsymbol{\phi}$), the simple reward will reduce
+to the maximal objective value observed during optimization:
 
 \begin{equation*}
     u(\mathcal{D}) = \max \boldsymbol{\phi}
@@ -424,19 +427,20 @@ routine:
 
 \newpage
 ## Global Reward
-The **global reward** is named as such since, similar to the simple reward,
-assumes that we are risk-neutral but now we allow the action space to be the
-entire domain $\mathcal{X}$. Using the same notation as before, the expected
-utility of the optimal recommendation is the global maximum of the posterior
-mean:
+The **global reward** is similar to the simple reward in that it assumes we are
+risk-neutral but now we allow the action space to be the entire domain
+$\mathcal{X}$. Then, the expected utility of the optimal recommendation is the
+global maximum of the posterior mean:
 
 \begin{equation*}
     u(\mathcal{D}) = \max_{x\in\mathcal{X}}\mu_{\mathcal{D}}(x)
 \end{equation*}
 
-Consider that by expanding the action space to include the entire domain, which
-includes points where we are inherently uncertain about the objective value at,
-this often leads to a different and potentially more risky recommendation.
+Recall that when the action space is expanded to include the entire domain, we
+inherently include points that were unseen about during the optimization
+process. Therefore, these "unseen" points are points where we are more uncertain
+about the objective value and can lead to a different and potentially more
+risky recommendation.
 
 ```{python}
 #| label: global-reward-example
@@ -444,7 +448,7 @@ this often leads to a different and potentially more risky recommendation.
 np.random.seed(1234)
 
 global_rwd_idx = np.argmax(objective(x))
-plt.figure(figsize=(10, 3))
+plt.figure(figsize=(10, 4))
 plt.plot(x, objective(x), c="k", label="Posterior Mean Function")
 plt.vlines(x[global_rwd_idx], ymin=0, ymax=objective(x[global_rwd_idx]),
            colors="b", linestyles="--", label="Global Reward")
@@ -455,112 +459,133 @@ plt.legend()
 plt.show()
 ```
 
+In the plot above, both the posterior mean function and observations denoted by
+the solid black line and red markers, respectively, are the same from the
+previous plot for the simple reward. However, with the global reward, we expand
+the action space to include the entire domain so the global reward is simply
+the globally maximal posterior mean value denoted by the vertical dashed blue
+line.
+
+\newpage
 ## A Tempting, Nonsensical Alternative to Simple Reward
-Here we discuss the tempting, but not entirely rational alternative to the
-simple reward brought up by Garnett. Specifically, we are referring to an
-alternative utility function that is deceptively similar to the simple reward:
-the maximum noisy observed value in the dataset, denoted
+Before we discuss other commonly used utility functions, let's review the
+tempting, but not exactly rational alternative to the simple reward that Garnett
+mentions. We are referring to an alternative utility function that is
+deceptively similar to the simple reward: the maximum noisy observed value in
+the dataset:
 
 \begin{equation*}
     u(\mathcal{D}) = \max \mathbf{y}
 \end{equation*}
 
-As Garnett notes, if we are dealing with _exact_ observations of the objective
-function then this utility reduces to the simple reward defined above. However,
-such reduction does not apply when dealing with inexact or noisy observations.
-In those cases, this utility is "rendered absurd". Furthermore, this absurdity
-is more prevalent in situations where an observed (noisy) maximum value reflects
-noise rather than actual optimization progress. Finally, we must add that if the
-signal-to-noise ratio is relatively high (i.e., the noise is not extreme) then
-this utility function can serve as an approximation to the simple reward. See
-Garnett Figure 6.2 for an extreme but helpfully illustrative example.
+Notice that if we specify the maximum **noisy** observed value in the dataset.
+This is because we assume that there is some sort of noise which leads to
+uncertainty in the objective function. If we are in the special case of dealing
+with exact observations then this utility function will reduce to the simple
+reward defined previously. However, when dealing with inexact or noisy
+observations (much more common), this utility is absurd.
+
+Garnett notes that the absurdity of the utility function is increased when the
+observed noisy maximum value is more reflective of noise than actual
+optimization progress. To that end, if the **signal-to-noise ratio** is
+relatively high (i.e., the noise is not extreme) then this utility function can
+be used as an approximation to the simple reward. See Figure 6.2 in Garnett's
+text for an extreme but helpfully illustrative example.
 
 ## Cumulative Reward
-The **cumulative reward** differs from the simple and global rewards in that it
-is based on the objective value of all points in the dataset. In particular, it
-rewards, and thus encourages, acquiring points with high _average_ objective
-values. Compared to the simple and global rewards which focus on the idea that
-our goal is to find the best point from the search space, the cumulative reward
-can be useful when the objective values of each and every point is important
-(i.e., if our optimization routine is responsible for controlling a critical,
-external system). For a dataset $\mathcal{D} = (\mathbf{x}, \mathbf{y})$, the
-cumulative reward is given by the sum of observed objective values:
+The **cumulative reward** differs from both the simple and global rewards in
+that it accounts for the objective value of every point in the dataset.
+Specifically, it rewards the acquisition of observations with high average
+objective values. Furthermore, in comparison to the simple and global rewards
+which operate under the notion that the goal is to find the best point from the
+search space, the cumulative reward is useful when the objective values of all
+observations in the dataset are important. This is common in applications where
+our optimization routine may be responsible for controlling a critical, external
+system.
+
+Given a returned dataset $\mathcal{D} = (\mathbf{x}, \mathbf{y})$, the
+cumulative reward is given by the sum of the observed objective values
+$\mathbf{y}$:
 
 \begin{equation*}
     u(\mathcal{D}) = \sum_{i} y_i
 \end{equation*}
 
-Garnett mentions a notable use of cumulative reward: _active search_. **Active**
-**search** is a mathematical model of scientific discovery wherein we select
-points for evaluation in a successive manner, aiming to identify points in a
-rare, value class $\mathcal{V}\subset\mathcal{X}$. When we observe a point
-$x\in\mathcal{X}$, it will yield a binary observation denoting whether or not
-the point is in the class (i.e., $y = \left[x\in\mathcal{V}\right]$). The motivation
-behind using cumulative reward is that during the search, we hope to find as
-many items in the desired class as we can.
+With regard to the practical usage of the cumulative reward, Garnett points out
+one notable use case: **active search**. Active search is a model for scientific
+discovery where we select points for evaluation in a successive manner with the
+goal of identifying as many points as possible in a rare, valuable class denoted
+$\mathcal{V}\subset\mathcal{X}$. To accomplish this, when we make an observation
+at location $x\in\mathcal{X}$, it will yield a binary observation representing
+whether or not the observation is in the desired class (i.e.,
+$y = \left[x\in\mathcal{V}\right]$).
 
+\newpage
 ## Information Gain
-The idea of **information gain** is that a dataset will be evaluated based on
-the (quantitative) amount of information it provides about a random variable of
-interest, where we prefer datasets that contain more knowledge about the random
-variable of interest. This approach is referred to as an _information-theoretic_
-one and is derived from the domain of _information theory_. Finally, it is an
-alternative approach to the simple, global, and cumulative rewards that evaluate
-a dataset based on the objective values it contains.
+The premise behind **information gain** is that we can evaluate the quality or
+utility of a dataset based on the quantitative amount of information it provides
+about a random variable of interest. In that respect, we will prefer datasets
+that contain more knowledge about the random variable of interest. This type of
+approach is referred to as _information-theoretic_ and originates from the
+domain of _information theory_. Furthermore, it serves as an alternative
+approach to the simple, global, and cumulative rewards that evaluate datasets
+based on the objective values they contain.
 
-Let $\omega$ be a random variable of interest we want to gain information about
-as we observe data. As Garnett notes, the choice of $\omega$ is open-ended and
-dependent on the application at hand. However, some natural choices include the
-location of global optimum, $x^*$, and the maximum objective value,
-$f^*$. Below, we follow Garnett's notation for quantifying the
-information contained by a dataset.
+Let $\omega$ be a random variable of interest we want to learn more about as we
+observe data during optimization. As noted by Garnett, the choice of $\omega$ is
+open-ended and depends on the application. However, there do exist some natural
+choices for $\omega$ such as the location of the global optimum $x^*$ and the
+maximum objective value $f^*$. Below, we will review how to quantify the
+information about $\omega$ contained in a dataset $\mathcal{D}$ using Garnett's
+notation.
 
-First, we quantify our initial uncertainty about $\omega$ using the differential
-_entropy_ of its prior distribution, $p(\omega)$:
+To begin, we will quantify our initial uncertainty about $\omega$ using the
+differential **entropy** of its prior distribution $p(\omega)$:
 
 \begin{equation*}
     H\left[\omega\right]=-\int p(\omega)\log p(\omega)\hspace{2pt}\text{d}\omega
 \end{equation*}
 
-\newpage
-Then, the _information gain_ provided by a dataset $\mathcal{D}$ is given by
-the difference in entropy between the prior and posterior distribution:
-
+From this, the **information gain** provided by a dataset $\mathcal{D}$ is given
+by the different in entropy between the prior and posterior distribution:
 \begin{equation*}
     u(\mathcal{D}) = H\left[\omega\right] -
         H\left[\omega\middle|\mathcal{D}\right]
 \end{equation*}
 
 where $H\left[\omega\middle|\mathcal{D}\right]$ is the differential entropy of
-the posterior. Note that Garnett's notation is not standard and he notes one
-particular caveat with it. The notation for the _conditional entropy_ of
-$\omega$ given $\mathcal{D}$ is the same as the notation used here for the
-differential entropy of the posterior,
-$H\left[\omega\middle|\mathcal{D}\right]$. However, for our context, this is
-fine and as noted by Garnett, if necessary we will denote the conditional
-entropy with an explicit expectation: $\mathbb{E}\left[H\left[\omega\middle|
-\mathcal{D}\right]\middle|\mathbf{x}\right]$.
+the posterior.
 
-Additionally, Garnett also raises a potential point of confusion due to an
-alternative definition of information gain used in literature: the
-_Kullback-Leibler (KL) divergence_ between the posterior and prior
-distributions.
+Be aware that Garnett's notation is not standard and there is one particular
+caveat with such notation. The notation for the conditional entropy of $\omega$
+given $\mathcal{D}$ is exactly the same as the notation we use here for the
+differential entropy of the posterior:
+$H\left[\omega\middle|\mathcal{D}\right]$. However, for our purposes, this is
+perfectly fine. Furthermore, as Garnett notes, if necessary we will denote the
+conditional entropy with an explicit expectation: $\mathbb{E}\left[H\left[
+\omega\middle|\mathcal{D}\right]\middle|\mathbf{x}\right]$.
+
+Furthermore, there is also an alternative definition of information gain used
+in literature that could be a point of confusion. The alternative definition of
+information gain is the **Kullback-Leibler (KL) divergence** between the
+posterior and prior distributions:
 
 \begin{equation*}
     u(\mathcal{D}) = D_{\text{KL}}\left[
-        p(\omega\vert\mathcal{D})\vert\vert p(\omega)\right]
+        p(\omega\vert\mathcal{D}) \vert\vert p(\omega)\right]
     = \int p(\omega\vert\mathcal{D})\log
         \frac{p(\omega\vert\mathcal{D})}{p(\omega)}\hspace{2pt}\text{d}\omega
 \end{equation*}
 
-These expressions allow us to quantify the information a dataset contains based
-on how our prior belief in $\omega$ changes after it is collected. The
-Kullback-Leibler divergence definition for information gain has some added
-convenience compared to the definition of information gain that came before it.
-In particular, the KL divergence expression of information gain is _invariant_
-to reparameterization of $\omega$ and is always nonnegative. Such properties are
-useful if unexpected observations are collected since such observations could
-cause the previous definition to become negative.
+\newpage
+The expressions from the previous page enable us to quantify the amount of
+information a dataset contains based on how our prior belief in $\omega$ changes
+after it is collected. In addition, the Kullback-Leibler divergence definition
+for information gain has some convenient properties compared to the definition
+before it: the KL divergence definition is **invariant** to reparameterization
+of $\omega$ and is always nonnegative. These properties are useful in cases
+when unexpected observations are collected and could cause the other definition
+to become negative (and therefore unintuitive).
 
 Luckily for us, the connection between these two definitions for information
 gain are surprisingly strong, especially for sequential decision making.
@@ -568,80 +593,75 @@ Specifically, the expectation with respect to observations are equal which means
 that when we maximize the expected utility using either definition, it will
 lead to the same decisions.
 
-\newpage
 ## Comparison of Utility Functions
-Now that we have reviewed multiple utility functions that (quantitatively)
-evaluate a dataset returned by an optimization process in some way, we can
-examine the subtle differences between their respective approaches. First, we
-will compare the simple reward to the other utility functions that we presented.
+Having reviewed several utility functions that quantitatively evaluate a
+returned dataset from an optimization process, we can begin to examine the
+subtle differences between their respective approaches. Since the simple reward
+is the most common utility function in Bayesian optimization, we will compare it
+to the other utility functions we presented earlier. Its popularity comes from
+its frequent use in conjunction with the prevalent **expected improvement (EI)**
+acquisition function. One key distinction between it and the others is that its
+approach considers only the local properties of the objective function posterior
+distribution to evaluate the data. This local approach is both rational and
+convenient computationally since it only considers the points visited during
+optimization.
 
-The simple reward is the most common utility function in Bayesian optimization
-due to its use in conjunction with the expected improvement (EI) acquisition
-function. A key distinction between this utility function and the others is that
-its approach uses only the _local_ properties of the objective function
-posterior to evaluate the data. As such, this "locality property" is both
-rational from the conceptual perspective and convenient from the computational
-perspective.
+Alternatively, the global reward utility function uses the global properties of
+the objective function. This stems from the decision to denote the entire domain
+as the action space meaning that the utility function will consider the entire
+posterior mean. Furthermore, it also means that this type of utility function
+has the option to recommend a point that was unobserved during optimization. In
+an entire different direction from the objective value-based approaches,
+information gain uses information theory to evaluate a dataset based on the
+change in knowledge it provides. This kind of approach considers the posterior
+entropy of the variable of interest and thus relies on the global properties of
+the objective function.
 
-Alternatively, other utility functions use the _global_ properties of the
-objective function. For instance, recall that the global reward allows the
-action space to be the entire domain so that utility function will take the
-entire posterior mean function into account. Furthermore, it means that this
-utility function is able to recommend a point after termination, even if it
-was unobserved during optimization.
-
-Moving away from the objective value-based approaches, information gain makes
-use of information theory and evaluates data based on the change in knowledge
-regarding the location or value of the optimum. Note that this approach will
-consider the posterior entropy of the location or value of the optimum so it
-still uses a global property.
-
-Finally, Garnett notes that since these utility functions use either the local
-or global properties of the posterior, there can be disagreement between the
-simple reward and other utility functions. Garnett provides some examples
-about datasets that have a good global outcome but poor local outcome (and vice
-versa). It is recommended to page through the last few pages of Chapter 6 to
-read about these examples and connect the concepts to the visual representations
-of these examples.
+Finally, since some utility functions consider the local properties and others
+consider the global properties, there can be disagreement between the simple
+reward and other utility functions. Garnett provides some examples of datasets
+that have a good global outcome but poor local outcome, and vice versa. It is
+recommended to page through the last few pages of Chapter 6 to read about these
+examples and connect these concepts to their visual counterparts.
 
 \newpage
-# Relationship Between Model of Objective Function and Utility Function
-Having discussed several common utility functions in Bayesian optimization,
+# Relationship Between the Model of the Objective Function and Utility Function
+After surveying the utility functions frequently used in Bayesian optimization,
 one hopefully recognizes the relationship between the model of the objective
 function and utility function: most of the utility functions are dependent on
-the underlying model of the objective function.
+the underlying model of the objective function. In this section, we will
+formalize this idea.
 
-For example, the first two utility functions (simple and global reward) are both
-defined based on the posterior mean function $\mu_{\mathcal{D}}$. Information
-gain relies on the posterior belief about location and value of the optimum
-$p(x^*, f^* \vert \mathcal{D})$. Both the posterior mean and the posterior
-beliefs are byproducts of the posterior distribution of the objective function.
+Consider the first two utility functions (the simple and global rewards). Both
+are defined using the posterior mean function $\mu_{\mathcal{D}}$. On the other
+hand, information gain relies on the posterior belief about the location and
+value of the optimum $p(x^*, f^* \vert \mathcal{D})$. Recognize that the
+posterior mean and the posterior beliefs are byproducts of the posterior
+distribution of the objective function (the model of the objective function).
 
-However, as Garnett explains, there are approaches to mitigate the dependence
-of the utility function on the model of the objective function. One approach is
-a computational mitigation strategy using _model averaging_. Recall that model
-averaging is a process where we marginalize the model with respect to the model
-posterior. Another approach is to define model-agnostic utility functions that
-are based on the data alone (i.e., no relation to a model) but this is fairly
-limited under the assumption that the utility should be sensible.
+However, this is not always ideal and there are approaches that mitigate the
+dependence of the utility function on the model of the objective function. One
+approach is a computational mitigation strategy using **model averaging**.
+Recall that model averaging is a process where we marginalize the model with
+respect to the model posterior. Another approach is to define model-agnostic
+utility functions that are based on the data alone (i.e., no relation to a
+model) but this is fairly limited under the assumption that the utility should
+be sensible.
 
  * One example of the latter approach is the cumulative reward since it is only
    defined based on the observed values $\mathbf{y}$.
  * Another example of the latter approach is the maximum function value utility
    but as noted previously, that utility's rationale diminishes if observation
-   values are plagued by noise.
+   values are noisy.
 
 Alternatives defined in the same manner as the examples above often have
-similar difficulties: noise will bias many natural measures such as order
+similar difficulties: noise will bias many natural measures such as the order
 statistics (i.e., minimum, maximum, etc.) of the observations. In particular,
 while for additive noise with zero mean, we would expect that the noise would
-not impact the cumulative reward at all but it will still affect the
+not impact the cumulative reward at all it would still affect the
 aforementioned order statistics.
 
 \newpage
 # References
-For full-reference details, the BibTeX entries can be found in the
-`bibliography.bib` file.
-
- * _Bayesian Optimization_ by Roman Garnett (2023)
- * _Bayesian Optimization: Theory and Practice Using Python_ by Peng Liu (2023)
+::: {#refs}
+:::
