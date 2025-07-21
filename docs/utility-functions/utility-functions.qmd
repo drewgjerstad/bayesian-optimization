@@ -31,111 +31,137 @@ import matplotlib.pyplot as plt
 
 \newpage
 # Introduction
-In the notes discussing **Bayesian decision theory**, one of the key components
-used to make optimal decisions was the _utility function_. Recall that the
-utility function evaluates the quality of the dataset returned by the
-optimization process, based on our preferences across outcomes expressed in the
-utility function. Provided we have a model of the objective function, the
-utility function enables us to determine the optimal policy by simply maximizing
-the expected the utility of each observation thereby maximizing the expected
-utility of the returned dataset. From this viewpoint, we only need to define
-an model that is consistent with our beliefs regarding the objective and a
-utility function that expresses our preferences.
+In the Bayesian decision theory notes, one of the mechanisms crucial to making
+optimal decisions was the **utility function**. The utility function evaluates
+the quality of the dataset returned by the optimization process based on the
+preferences we express via the utility function itself. Given a model of the
+objective, the utility function allows us to derive the optimal policy very
+simply: maximize the expected utility of each observation and consequently
+maximize the expected utility of the returned dataset. Therefore, we can
+identify very clearly what is required of us: define a model that is consistent
+with our beliefs about the objective and define a utility function that
+expresses our preferences across outcomes.
 
-Take into account that neither defining a model for the objective function nor
-defining a utility function is a trivial task. As Garnett notes, breaking down
-our beliefs and preferences (concepts that are rather internalized in humans)
-to mathematical expressions is difficult. However, we do have avenues that we
-can take to mathematically express our beliefs and preferences such as surrogate
-models (i.e., Gaussian processes [GPs]) and utility functions (i.e., Expected
-Improvement [EI]). In these notes, we will focus on defining utility functions
-that are consistent with our preferences over outcomes. This will include
-examining several commonly used utility functions whose underlying motivation
-often contributes to novel approaches. Please note that while we often use
-Gaussian processes regularly in other notes, we will follow Garnett's notation
-which does not assume the surrogate model is a Gaussian process.
+However, while we can clearly identify _what_ we need to do, the _how_ we do it
+is not exactly trivial. For instance, as Garnett points out, our beliefs and
+preferences are innately internalized which makes it difficult to break them
+down into mathematical expressions. Luckily, there are avenues we can take to
+mathematically express our beliefs and preferences using surrogate models (i.e.,
+Gaussian processes) and utility functions (i.e., expected improvement),
+respectively. In these notes, we focus on how to define utility functions that
+are consistent with our preferences, including a review of utility functions
+frequently used in Bayesian optimization. Many of these utility functions'
+underlying motivation often contribute to novel approaches. Finally, we follow
+Garnett's position when delving into utility functions: while Gaussian processes
+are common in Bayesian optimization, we will not assume that the surrogate model
+is a Gaussian process.
 
+\newpage
 # Expected Utility of the Final Recommendation
-The point of optimization is to search the space of candidates in order to find
-the best candidate that we implicitly decide to use, likely in another
-procedure. For instance, as shown in the applications of Bayesian optimization
-section of the "Introduction to Bayesian Optimization" notes, our goal may be to
-find the next molecule or protein candidate that satisfies certain properties.
-However, as we have seen with optimization, the best candidate is often found
-later on in the optimization process which means that for the most part, the
-data (chosen candidate observations) acquired during the routine is only used to
-help guide us towards the best candidate.
+Simply put, the purpose of optimization is to search the space of candidates for
+the best candidate that we implicitly decide to use, often in another routine.
+Recall the applications provided in the _Introduction to Bayesian Optimization_
+notes: when applying (Bayesian) optimization for AutoML purposes, we are
+searching the space of candidate _hyperparameters_ that will be used to train
+a neural network---in hopes that when the network is re-evaluated its
+performance (i.e., classification accuracy) improves. However, as we have seen,
+the best candidate is typically found closer to the termination of the
+optimization process meaning that for the most part, the dataset that we acquire
+during optimization is only used to guide us towards the best candidate.
 
-From Garnett, it is obvious that selecting this "best candidate" for use in
-another procedure can be considered a _decision_. Therefore, if the goal of
-performing optimization across a search space is to guide the final decision
-then the optimization policy should maximize the expected utility of the final
-decision.
+Clearly, the selection of the "best candidate" can be regarded as another
+**decision**. Thus, if the goal of optimization is to guide us to the optimal
+final decision then the optimization policy should be designed to maximize the
+expected utility of the final decision. In this section, we will focus on (1)
+defining the "final recommendation" as a decision, (2) selecting an action space
+to move across, and (3) selecting a utility function to use when evaluating
+candidate observations.
 
 ## Defining the Final Recommendation Decision
-Suppose that our (pre-run) optimization process returned an arbitrary dataset
-$\mathcal{D} = (\mathbf{x}, \mathbf{y})$. Then, suppose that our goal
-is to use the returned dataset to recommend a candidate $x \in \mathcal{X}$ for
-use in another procedure where the performance is determined by the underlying
-objective function value denoted $\phi = f(x)$. Aforementioned, this
-recommendation is considered to be a _decision under uncertainty_ about the
-objective function value that is informed by the predictive distribution denoted
-$p(\phi\vert x, \mathcal{D})$.
+We stated previously that the best candidate is typically viewed as the "final"
+recommendation for another system and can thus be regarded as a decision. Here,
+we will define the final recommendation decision in a mathematical manner such
+that it becomes evident how the utility function aids this decision. Note that
+in some literature, the terms _final recommendation_ and _terminal_
+_recommendation_ are used interchangeably.
 
-Similarly to previous notes, fully defining the decision problem requires us to
-identify the action space, $\mathcal{A} \subset \mathcal{X}$, for our
-recommendation and a utility function $v(\phi)$ that will evaluate a
-recommendation post-hoc based on the objective function value $\phi$. Having
-defined these, a recommendation considered to be _rational_ should maximize the
-expected utility:
+First, suppose that our optimization process returned an arbitrary dataset
+$\mathcal{D} = (\mathbf{x}, \mathbf{y})$. Then, suppose that we aim to use this
+returned dataset to recommend a candidate $x \in \mathcal{X}$ that will be used
+in another, external routine. In this external routine, the performance is
+quantified by the underlying objective function value denoted $\phi = f(x)$.
+Once again, this recommendation is regarded as a **decision under uncertainty**
+about the objective value that is informed by the posterior predictive
+distribution denoted by $p(\phi\vert x, \mathcal{D})$.
+
+Recall that in order to completely define the decision problem, we must identify
+the action space $\mathcal{A} \subset \mathcal{X}$ for our recommendation and
+identify a utility function $v(\phi)$ to evaluate a recommendation post-hoc
+based on the objective value $\phi$. Once these are defined, a **rational**
+recommendation should maximize the expected utility:
 
 \begin{equation*}
     x \in \argmax_{x^\prime\in\mathcal{A}} \mathbb{E}\left[
         v(\phi^\prime)\vert x^\prime, \mathcal{D}\right]
 \end{equation*}
 
-Since the expected utility of the recommendation is only dependent on the
-dataset returned by the optimization process, it leads to a natural utility that
-we can use in optimization. This _natural_ utility function computes the
-expected quality of an optimal final (terminal) recommendation given the
-returned dataset:
+\newpage
+Notice that the recommendation's expected utility above is only dependent on the
+returned dataset from the optimization process. This property brings about a
+natural utility that we can use in optimization. The **natural utility**
+function computes the expected quality of an optimal final recommendation given
+the returned dataset $\mathcal{D}$:
 
 \begin{equation*}
     u(\mathcal{D}) = \max_{x^\prime\in\mathcal{A}}\mathbb{E}\left[
         v(\phi^\prime)\vert x^\prime,\mathcal{D}\right]
 \end{equation*}
 
-Note that the expected utility of the recommendation will not depend on the
-optimal recommendation since we are maximizing the objective function value.
-Furthermore, the expected utility of the recommendation will not depend on the
-optimal recommendation's objective function value either since we are computing
-the expectation of the objective function value given the candidate and returned
-dataset.
+Furthermore, the recommendation's expected utility will also not depend on the
+optimal recommendation itself (i.e, $x^\prime$) since we are selecting the
+maximal expected objective function value. Thus, since we are computing the
+expectation of the objective function value given the candidate and returned
+dataset, the expected utility will not depend on the optimal recommendation's
+objective value either.
 
-Garnett explains, while referring back to the visualization of the sequential
-decision tree in Figure 5.4, that the utility function will in effect,
-"collapse" the expected utility of a final decision into a utility of the
-returned dataset. Thus, we can select the action space and utility function for
-the final recommendation based purely on the problem at hand. We will consider
-Garnett's advice for these selections below.
+Referencing the depiction of the sequential decision tree in Figure 5.4,
+Garnett notes that the utility function will effectively "collapse" the expected
+utility of a final decision into a utility of the returned dataset. This means
+that we are able to select the action space and utility function for the final
+recommendation based purely on the problem at hand. We will consider Garnett's
+advice for these selections next.
 
 ## Selecting an Action Space
-First, we need to select an action space, $\mathcal{A}\subset\mathcal{X}$, for
-our recommendation. There are two rather extreme choices, one being maximally
-restrictive and the other maximally permissive.
+We need to select an action space for our recommendation, denoted by
+$\mathcal{A}\subset\mathcal{X}$. Let's take a look at two extreme options with
+one being maximally restrictive and the other being maximally permissive.
 
- * At one extreme, the **maximally restrictive** option will restrict our
-   recommendation choices to only visited points $\mathbf{x}$. While this
-   option ensures we have at least some knowledge of the objective function at
-   our recommended point, it does not allow for any exploration: we may not have
-   visited the best point and so the best point may not be contained in
-   $\mathbf{x}$.
+ * The **maximally restrictive** option restricts our recommendation choices to
+   only the points visited during optimization, $\mathbf{x}$. Although this
+   option will ensure that we have at least some knowledge of the objective
+   function at our recommended point, it does not allow for any exploration. In
+   other words, we may not have visited the best point so it will not be
+   contained in $\mathbf{x}$ and we are therefore unable to recommend it.
 
- * At the other extreme, we could be **maximally permissive** and select the
-   action space to be the entire domain $\mathcal{X}$. However, choosing the
-   entire domain to be our action space will require us to have faith in the
-   objective function model's beliefs, particularly when recommending an
-   unvisited point.
+ * The **maximally permissive** option defines the action space to be the entire
+   domain $\mathcal{X}$. However, opting to have the entire domain be our action
+   space will require us to have faith in the objective function model's belief,
+   particularly when recommending an unvisited point. In other words, while it
+   gives us more freedom to explore, it also means we have to be careful about
+   where our model has higher uncertainty.
+
+The plots on the following page provide examples of these two extreme options.
+On the left, the plot shows an example of the maximally restrictive option that
+only allows visited points to be recommended. Clearly, our observations denoted
+by the red markers do not include the true optimum denoted by the blue marker.
+
+On the other hand, the plot to the right shows an example of the maximally
+permissive option that denotes the entire domain to be the action space. As
+shown by the dashed red line, our model is very erroneous and does not capture
+the underlying objective. In particular, we could end up recommending points
+that have the highest model value but not the highest objective model. While
+these examples themselves are extreme and a bit exaggerated, they represent the
+risks present if we use either extreme to select an action space.
 
 ```{python}
 #| label: extreme-action-space
@@ -164,22 +190,24 @@ ax[0].legend(loc="upper left")
 np.random.seed(1234)
 x_obs = (np.linspace(0, np.pi, 100))[np.random.randint(0, 99, 8)]
 ax[1].plot(x, objective(x), label="Objective Function", c="k")
-ax[1].plot(x, erroneous_model(x), label="Erroneous Model", c="b",
-           linestyle="--")
-ax[1].scatter(x_obs, erroneous_model(x_obs), label="Observations", c="b")
 ax[1].scatter(x_obs, objective(x_obs), label="True Observations", c="k",
               marker="D")
+ax[1].plot(x, erroneous_model(x), label="Erroneous Model", c="r",
+           linestyle="--")
+ax[1].scatter(x_obs, erroneous_model(x_obs), label="Observations", c="r")
 ax[1].set_title("Risk of Maximally Permissive Option")
 ax[1].set_ylim((0, 15))
 ax[1].legend(loc="upper left")
 plt.show()
 ```
 
-In literature, there have been some suggestions of compromise between the two
-extremes with Garnett citing an example from Osborne et al. wherein the final
-recommendation choice is restricted to points where the objective value is known
-within some acceptable tolerance. Osborne et al. accomplished this compromise
-by defining a parametric and data-dependent action space with form
+While these are the extreme options that one could take to select an action
+space, there have been some more reasonable suggestions in the literature. One
+reasonable suggest is shown in Osborne et al. and is essentially a compromise
+between the two extremes. Specifically, the final recommendation choice is
+restricted to points where the objective value is known within some acceptable
+tolerance. Osborne et al. defined a parametric and data-dependent action space
+(with form given below) to achieve this compromise.
 
 \begin{equation*}
     \mathcal{A}(\varepsilon;\mathcal{D}) = \{
@@ -189,84 +217,120 @@ by defining a parametric and data-dependent action space with form
     \}
 \end{equation*}
 
-where $\varepsilon$ denotes a threshold representing the highest amount of
-acceptable uncertainty in the objective function value. Since this approach
+In the expression above, $\varepsilon$ denotes a threshold for the highest
+amount of acceptable uncertainty in the objective function value. This approach
 should, for the most part, avoid issues of recommending points at locations
-where the objective function is not sufficiently known, we will pause our
-discussion of selecting an action space and move onto our discussion of
-selecting a utility function.
+where the objective function is not sufficiently known while allowing for some
+exploration beyond the points visited during optimization.
 
+\newpage
 ## Selecting a Utility Function
-We need to select a utility function $v(\phi)$ that will evaluate a
-recommendation $x$ after we have observed its corresponding objective function
-value $\phi$. Since our focus has been on maximization, the utility should be
-_monotonically_ increasing in $\phi$.
+In addition to selecting an action space for our recommendation, we also need to
+select a utility function $v(\phi)$ that will evaluate a recommendation $x$
+after we observe its corresponding objective function value $\phi$. For our
+purposes, we have been focusing on maximization so the utility function should
+be **monotonically increasing** in $\phi$. This means that as the objective
+value $\phi$ increases, its utility $v(\phi)$ should also increase.
 
- * Keep in mind that if the decision problem calls for it, it is fairly trivial
-   to change the focus from maximization to minimization and vice versa.
+ * Remember that if the decision problem calls for it, it is fairly trivial to
+   change the focus and setup from maximization to minimization, and vice versa.
 
-Although we know that the utility should always be increasing in $\phi$, there
-is still the question of what shape the function ought to assume. In truth, the
-shape that the function will take will inherently depend on our _risk_
-_tolerance_. **Risk tolerance** refers to the tradeoff between potentially
-obtaining a higher expected value but with greater uncertainty thereby imposing
-some risk in our recommendation. The alternative could have a lower expected
-value with lower uncertainty, making it a safer albeit lower recommendation.
+While we know that the utility function should always be increasing in $\phi$,
+there is still the question of what shape the function ought to assume. The
+answer to this question will depend on our **risk tolerance**. Risk tolerance
+refers to the tradeoff between potentially obtaining a higher expected value but
+with greater uncertainty thereby imposing some risk in our recommendation.
+Alternatively, we could have a lower expected value with lower uncertainty
+making it a safer recommendation.
 
- * A **risk-tolerant** utility function will allow for more risk to potentially
-   attain greater reward (i.e., higher expected value but higher uncertainty).
+ * A **risk-tolerant** (convex) utility function will allow for more risk to
+   potentially attain greater reward (i.e., higher expected value but higher
+   uncertainty).
 
- * A **risk-averse** utility function will avoid imposing risk and will err
-   towards lower risk even if it means a lower reward (i.e., lower uncertainty
-   but lower expected value).
+ * A **risk-neutral** (linear) utility function is indifferent between points
+   with equal expected value without regard to their uncertainty.
 
-The most simple and common utility in Bayesian optimization is a linear utility:
+ * A **risk-averse** (concave) utility function will avoid risk and err towards
+   lower risk even if it means a lower reward (i.e., lower uncertainty but lower
+   expected value).
+
+The plots below illustrate the shape the utility function would take based on
+the risk tolerance.
+
+```{python}
+#| label: risk-tolerance
+#| echo: false
+
+fig, ax = plt.subplots(nrows=1, ncols=3, figsize=(14, 4))
+
+x = np.linspace(0, 10, 100)[1:]
+
+ax[0].plot(x, np.pow(x, 2), c="b")
+ax[1].plot(x, x, c="b")
+ax[2].plot(x, np.log(x), c="b")
+
+ax[0].set_title("Risk-Tolerant (Convex)\nUtility Function")
+ax[1].set_title("Risk-Neutral (Linear)\nUtility Function")
+ax[2].set_title("Risk-Averse (Concave)\nUtility Function")
+
+for i in range(len(ax)):
+    ax[i].set_xticks([])
+    ax[i].set_yticks([])
+    ax[i].set_xlabel("Objective Value")
+    ax[i].set_ylabel("Utility")
+
+plt.show()
+```
+
+\newpage
+The most simple and commonly used utility function in Bayesian optimization is a
+risk-neutral, linear utility function:
 
 \begin{equation*}
     v(\phi) = \phi
 \end{equation*}
 
-If we are using a linear utility, then the expected utility from recommending
-$x$ will be the posterior mean of $\phi$:
+When the utility function is linear, the expected utility from recommending $x$
+is simply the posterior mean of $\phi$:
 
 \begin{equation*}
     \mathbb{E}\left[v(\phi)\middle| x, \mathcal{D}\right] = \mu_{\mathcal{D}}(x)
 \end{equation*}
 
-Notice that when using a linear utility, the objective function's uncertainty is
-not even considered when making a decision. In fact, we are considered to be
-_risk neutral_ since we don't differentiate between points with equal expected
-values based on their respective uncertainty. Garnett adds that while being risk
-neutral is computationally convenient due to its simplicity, such a utility may
-not be consistent with our true preferences.
+Recall that the risk-neutral, linear utility function does not consider the
+uncertainty in the objective function when making a decision. While this type of
+utility is simple and therefore computationally convenient, it may not truly be
+consistent with our preferences.
 
-In order to reason about risk preferences, we can consider the **certainty**
-**equivalent**. The certainty equivalent is an objective value corresponding to
-a (hypothetical) _risk-free_ alternative recommendation to which our preferences
-would be indifferent. For example, suppose we have a risky potential
-recommendation $x$ where we do not know the value of the objective function
-exactly at $x$. The certainty equivalent for $x$ is an objective function value
-$\phi^\prime$ such that
+In addition to expressing our risk preferences, we can reason about them using
+the **certainty equivalent**. The certainty equivalent is an objective value
+that corresponds to a (hypothetically) risk-free alternative recommendation to
+which our preferences would be indifferent. For instance, suppose that we have a
+risky potential recommendation $x$ where we do not know its true corresponding
+value of the objective function. Then, the certainty equivalent for $x$ is an
+objective function value $\phi^\prime$ such that
 
 \begin{equation*}
     v(\phi^\prime) = \mathbb{E}\left[v(\phi)\middle| x,\mathcal{D}\right]
 \end{equation*}
 
-If we are using a risk-neutral utility then the certainty equivalent of some
-point $x$ is its expected value: $\phi^\prime =\mu_{\mathcal{D}}(x)$. This means
-that we would only abandon one recommendation in favor of another if the latter
-had a higher expected value (regardless of risk). Alternatively, we may want to
-express our risk-aware preferences using _nonlinear_ utility functions.
+When using a risk-neutral utility, the certainty equivalent of some point $x$ is
+its expected value: $\phi^\prime = \mu_{\mathcal{D}}(x)$. Therefore, we would
+only abandon one recommendation in favor of another if the if the latter had a
+higher expected value without considering risk. Alternatively, we may want to
+express our risk-aware preferences using **nonlinear** utility functions.
 
+\newpage
 # A Note on Nonlinear Utility Functions
-Aforementioned, we may wish (or truly need) to express our risk-aware
-preferences using _nonlinear_ utility functions. Specifically, consider a
-scenario where our preferences lean more towards _risk aversion_. In such a
-scenario, we may accept a recommendation point with a lower expected value if it
-also results in less risk. To express these preferences in a utility function,
-we can use a concave function of the objective value. Garnett uses Jensen's
-inequality as an example of a utility function expressing risk averse
-preferences:
+As mentioned in the previous section, we may wish (or even truly need) to
+express our risk-aware preferences using nonlinear utility functions. To
+illustrate this, let's consider a scenario where our preferences lean more
+towards risk aversion. With these preferences, we may accept a recommendation
+point with a lower expected value if it also results in less risk. From our
+previous discussion on the shape of utility functions based on risk tolerance,
+we should express these preferences using a concave utility function. Garnett
+uses Jensen's inequality as an example of a utility function expressing risk
+averse preferences:
 
 \begin{equation*}
     v(\phi^\prime) = \mathbb{E}\left[v(\phi)\middle| x,\mathcal{D}\right] \leq
@@ -274,21 +338,18 @@ preferences:
     v(\mu_{\mathcal{D}}(x))
 \end{equation*}
 
-Under this utility function, the certainty equivalent of some risky
-recommendation will be _less_ than its expected value. In a similar manner, we
-may wish to express _risk-seeking_ preferences using a **convex** utility
-function. In such a case, the certainty equivalent of some risky recommendation
-will be _greater_ than its expected value. Thus, our preferences will implicitly
-push toward gambling. 
+With this utility function, the certainty equivalent of a risky recommendation
+will be less than its expected value. On the other hand, we could express
+risk-seeking preferences using a convex utility function. In such a case, the
+certainty equivalent of a risky recommendation will be greater than its expected
+value. Then, our preferences will implicitly push toward gambling. For obvious
+reasons, literature on economic and decision theory have proposed several
+risk-averse utility functions although these (and risk-seeking utility
+functions) are not typically used in Bayesian optimization. Note that these
+types of utilities can be useful in certain settings, especially where risk
+neutrality is questionable.
 
-Various risk-averse utility functions have been proposed in literature
-pertaining to economics and decision theory, for obvious reasons. However, since
-risk-averse and risk-seeking utilities are not used much in Bayesian
-optimization, we follow Garnett in not including a full discussion as it would
-be out-of-scope. Note that these types of utilities can be useful in certain
-settings, especially where risk neutrality is questionable.
-
-Before we move on, let's review a natural approach to quantify the risk
+Before continuing, let's review a natural approach to quantify the risk
 associated with a recommendation of an uncertain value $\phi$. To do this, we
 simply use its standard deviation:
 
@@ -309,11 +370,12 @@ penalizing risk (inducing risk-averse behavior), $\beta > 0$ rewarding risk
 framework serves as the base for two common utility functions in Bayesian
 optimization: _simple reward_ and _global reward_. We will discuss these next.
 
+\newpage
 # Common Utility Functions
-In this section, we review utility functions from Bayesian optimization
-literature and practice. This section is by no means exhaustive with respect to
-including each and every utility function out there but rather an exposition of
-the commonly used utility functions in Bayesian optimization.
+In this section, we review utility functions common in Bayesian optimization
+literature and practice. This is by no means an exhaustive review of each and
+every utility function out there but rather an exposition of the utility
+functions frequently used in Bayesian optimization.
 
 ## Simple Reward
 The **simple reward** is named as such since it assumes that we are risk-neutral
@@ -360,6 +422,7 @@ routine:
     u(\mathcal{D}) = \max \boldsymbol{\phi}
 \end{equation*}
 
+\newpage
 ## Global Reward
 The **global reward** is named as such since, similar to the simple reward,
 assumes that we are risk-neutral but now we allow the action space to be the
@@ -459,6 +522,7 @@ _entropy_ of its prior distribution, $p(\omega)$:
     H\left[\omega\right]=-\int p(\omega)\log p(\omega)\hspace{2pt}\text{d}\omega
 \end{equation*}
 
+\newpage
 Then, the _information gain_ provided by a dataset $\mathcal{D}$ is given by
 the difference in entropy between the prior and posterior distribution:
 
@@ -504,6 +568,7 @@ Specifically, the expectation with respect to observations are equal which means
 that when we maximize the expected utility using either definition, it will
 lead to the same decisions.
 
+\newpage
 ## Comparison of Utility Functions
 Now that we have reviewed multiple utility functions that (quantitatively)
 evaluate a dataset returned by an optimization process in some way, we can
@@ -539,6 +604,7 @@ versa). It is recommended to page through the last few pages of Chapter 6 to
 read about these examples and connect the concepts to the visual representations
 of these examples.
 
+\newpage
 # Relationship Between Model of Objective Function and Utility Function
 Having discussed several common utility functions in Bayesian optimization,
 one hopefully recognizes the relationship between the model of the objective
