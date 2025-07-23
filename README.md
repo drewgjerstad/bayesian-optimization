@@ -29,6 +29,9 @@ topics.
 ## 📁 `examples`
 This directory contains notebooks exploring various examples of Bayesian
 optimization and its applications.
+ * [**BoTorch Tutorials**](examples/botorch_tutorials.ipynb)  
+    _This notebook contains tutorials from BoTorch's documentation and_
+    _tutorials._
  * [**Introduction to GPyTorch and GAUCHE**](examples/gpytorch_and_gauche.ipynb)  
     _This notebook synthesizes information from GPyTorch and GAUCHE's_
     _documentation regarding Gaussian processes for machine learning and how to_
@@ -52,8 +55,6 @@ optimization and related topics. The BibTeX entries can be found in the
 
 <!---
 Topics
- - Introduction to Bayesian Optimization
-    - Garnett Chapter 1, Liu Chapter 1, R+W Chapter 1, Shahriari Paper
  - Bayesian Decision Theory
     - Garnett Chapter 5, Liu Chapter 3, Garnett 9.3
  - Gaussian Processes
@@ -62,8 +63,6 @@ Topics
     - R+W Chapter 4
  - Model Evaluation and Selection
     - Garnett Chapter 4
- - Utility Functions
-    - Garnett Chapter 6
  - Acquisition Functions
     - Garnett Chapter 7
  - Computing Acquisition Functions
