@@ -21,7 +21,6 @@ topics.
 * [**Model Evaluation and Selection**](docs/model-evaluation/model-evaluation.pdf)
 * [**Utility Functions**](docs/utility-functions/utility-functions.pdf)
 * [**Acquisition Functions**](docs/acquisition-functions/acquisition-functions.pdf)
-* [**Computing Acquisition Functions**](docs/computing-acq-functions/computing-acq-functions.pdf)
 * [**GP Regression**](docs/gp-regression/gp-regression.pdf)
 * [**GP Classification**](docs/gp-classification/gp-classification.pdf)
 
@@ -64,9 +63,7 @@ Topics
  - Model Evaluation and Selection
     - Garnett Chapter 4
  - Acquisition Functions
-    - Garnett Chapter 7
- - Computing Acquisition Functions
-    - Garnett Chapter 8, Garnett 9.2
+    - Garnett Chapter 7, Chapter 8, Garnett 9.2
  - GP Regression
     - R+W Chapter 2
  - GP Classification

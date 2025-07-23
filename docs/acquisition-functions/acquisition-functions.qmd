@@ -26,6 +26,12 @@ nocite: |
 
 \newpage
 # Introduction
+
+## Purpose of Acquisition Functions
+
+## Types of Acquisition Functions
+
+<!---
 At the core of optimization is the **acquisition function** (also referred to as
 the **policy**) that decides where to observe next based on the available data.
 Since we are focusing on Bayesian optimization, we will consider acquisition
@@ -59,6 +65,7 @@ arms in a manner that maximizes the expected cumulative reward. We will extend
 this to model optimization such that algorithms with strong performance
 guarantees for multi-armed bandits can inspire high-performing acquisition
 functions for Bayesian optimization.
+-->
 
 \newpage
 # Decision-Theoretic Acquisition Functions
@@ -77,6 +84,9 @@ figure 7.8
 table of potential values for \alpha (pg 135) from Jones
 --->
 
+\newpage
+# Information-Theoretic Acquisition Functions
+
 ## Knowledge Gradient (KG)
 
 ## Mutual Information (MI) and Entropy Search (ES)
@@ -85,14 +95,12 @@ entropy search uses the MI acquisition function
 -->
 
 \newpage
-# Related Topics from Optimization
-
-## Multi-Armed Bandits
+# Acquisition Functions from Multi-Armed Bandits
 <!---
-see first page for extension of MAB to optimization using IAB
+See first page for extension of MAB to optimization using IAB
 -->
 
-## Statistical Upper Bound (UCB)
+## Statistical Upper Confidence Bound (UCB)
 
 ## Thompson Sampling
 
@@ -101,6 +109,8 @@ see first page for extension of MAB to optimization using IAB
 <!---
 For policy construction: (1) one-step lookahead, (2) policies from MABs
 -->
+
+# Computing Acquisition Functions
 
 \newpage
 # References
