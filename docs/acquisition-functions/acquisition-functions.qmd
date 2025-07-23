@@ -18,4 +18,91 @@ format:
                \DeclareMathOperator*{\argmax}{\text{arg}\max}
                \DeclareMathOperator*{\argmin}{\text{arg}\min}
 jupyter: conda-env-main-env-py
+bibliography: acquisition-functions.bib
+csl: /Users/drewgjerstad/repos/bayesian-optimization/acm.csl
+nocite: |
+  @*
 ---
+
+\newpage
+# Introduction
+At the core of optimization is the **acquisition function** (also referred to as
+the **policy**) that decides where to observe next based on the available data.
+Since we are focusing on Bayesian optimization, we will consider acquisition
+functions that refer to our probabilistic beliefs about the objective function
+when making decisions likely to result in favorable outcomes. In previous notes,
+we examined utility functions which are used to assist the acquisition function
+evaluate candidate observations based on their potential to aid the optimization
+process. In these notes, we will discuss acquisition functions with a particular
+focus on the acquisition functions frequently used in Bayesian optimization and
+the common themes in their design.
+
+In Bayesian optimization, there are two main approaches used in acquisition
+function design: decision-theoretic and multi-armed bandit-inspired. The
+**decision-theoretic** approach uses Bayesian decision theory and is the most
+prevalent approach in Bayesian optimization, see the _Bayesian Decision Theory_
+notes for background. Recall that Bayesian decision theory provides us with a
+framework to derive the (exact) optimal policy, although typically these are
+intractable and have little practical value. However, there are approximations
+to the optimal policy that are both tractable and practical and we will use
+those ideas to design acquisition functions that are also both tractable and
+practical.
+
+Alternatively, we can apply algorithms for **multi-armed bandits** to the
+optimization setting. A multi-armed bandit is a finite-dimensional model of
+sequential optimization with noisy observations. In particular, we have an
+"agent" faced with a finite set of "arms" representing potential actions and
+corresponding stochastic rewards from unknown distributions for each arm. The
+agent must select a sequence of arms from the set with the sequence yielding the
+cumulative reward. Thus, we aim to design a policy that sequentially selects
+arms in a manner that maximizes the expected cumulative reward. We will extend
+this to model optimization such that algorithms with strong performance
+guarantees for multi-armed bandits can inspire high-performing acquisition
+functions for Bayesian optimization.
+
+\newpage
+# Decision-Theoretic Acquisition Functions
+
+<!---
+summary of one-step lookahead acquisition functions (pg 127),
+connecting utility functions to corresponding AF
+-->
+
+## Expected Improvement (EI)
+
+## Probability of Improvement (PI)
+
+<!---
+figure 7.8
+table of potential values for \alpha (pg 135) from Jones
+--->
+
+## Knowledge Gradient (KG)
+
+## Mutual Information (MI) and Entropy Search (ES)
+<!---
+entropy search uses the MI acquisition function
+-->
+
+\newpage
+# Related Topics from Optimization
+
+## Multi-Armed Bandits
+<!---
+see first page for extension of MAB to optimization using IAB
+-->
+
+## Statistical Upper Bound (UCB)
+
+## Thompson Sampling
+
+\newpage
+# Constructing Acquisition Functions
+<!---
+For policy construction: (1) one-step lookahead, (2) policies from MABs
+-->
+
+\newpage
+# References
+::: {#refs}
+:::
