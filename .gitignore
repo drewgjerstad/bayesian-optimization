@@ -1,2 +1,3 @@
 /.quarto/
 src/__pycache__/
+src/wandb/
