@@ -5,6 +5,7 @@ the BoTorch tutorial for SAASBO (extended for other purposes).
 """
 
 # Load Dependencies
+import wandb
 import torch
 from torch.quasirandom import SobolEngine
 from botorch import fit_fully_bayesian_model_nuts
@@ -14,8 +15,14 @@ from botorch.optim import optimize_acqf
 from botorch.test_functions import Branin
 
 from botorch.acquisition.logei import qLogExpectedImprovement
-
-from plotting import parity_plot, progress_plot
+from botorch.acquisition import (
+    qExpectedImprovement,
+    qProbabilityOfImprovement,
+    qKnowledgeGradient,
+    qMaxValueEntropy,
+    qLowerConfidenceBound,
+    qUpperConfidenceBound,
+)
 
 def branin_function(x:torch.Tensor, **tkwargs) -> torch.Tensor:
     """
@@ -81,7 +88,7 @@ def get_sobol_datasets(dimension:int, n_initial:int, n_test:int,
 
 
 def bayes_opt_loop(datasets:tuple, mc_params:tuple, eval_budget_params:tuple,
-                   dim:int, acquisition_function) -> tuple:
+                   dim:int, acquisition_function, run=None) -> tuple:
     """
     This function runs a Bayesian optimization loop. It will return a tuple
     containing the final datasets acquired during optimization.
@@ -97,6 +104,8 @@ def bayes_opt_loop(datasets:tuple, mc_params:tuple, eval_budget_params:tuple,
             Problem dimension.
         acquisition_function:
             Acquisition function.
+        run (wandb.Run, default=None):
+            If specified, loop will log "best_value_found".
 
     Returns:
         final_datasets (tuple):
@@ -114,6 +123,7 @@ def bayes_opt_loop(datasets:tuple, mc_params:tuple, eval_budget_params:tuple,
 
     # Optimization Loop
     for i in range(N_ITERATIONS):
+        print(f"\tStarting iteration ({i+1})...")
         # Flip Sign to Minimize the Function
         train_Y_neg = -1 * train_Y
 
@@ -151,12 +161,30 @@ def bayes_opt_loop(datasets:tuple, mc_params:tuple, eval_budget_params:tuple,
         if Y_next.min() < train_Y.min():
             idx_best = Y_next.argmin()
             x0, x1 = candidates[idx_best, :2].tolist()
-            print(f"{i+1}) New Best: {Y_next[idx_best].item():.3f} @ "
+            print(f"\t\t* New Best: {Y_next[idx_best].item():.3f} @ "
                   f"[{x0:.3f}, {x1:.3f}]")
-            
+
+            # Log New Best to W&B
+            if run:
+                run.log({
+                    "best_value_found": Y_next.min(),
+                    "mc_iteration": i+1,
+                    "n_evaluations": N_INITIAL + (i+1) * BATCH_SIZE
+                })
+        else:
+            # Log "Old" Best to W&B
+            if run:
+                run.log({
+                    "best_value_found": train_Y.min(),
+                    "mc_iteration": i+1,
+                    "n_evaluations": N_INITIAL + (i+1) * BATCH_SIZE
+                })
+
         # Augment Dataset with New Observations
         train_X = torch.cat((train_X, candidates))
         train_Y = torch.cat((train_Y, Y_next))
+
+        print(f"\tFinish iteration ({i+1}).\n")
 
     return train_X, test_X, train_Y, test_Y
 
@@ -186,28 +214,69 @@ def main():
     N_ITERATIONS = 8
     BATCH_SIZE = 5
 
-    # Generate Datasets
-    train_X, test_X, train_Y, test_Y = get_sobol_datasets(
-        DIM, N_INITIAL, 50, 1234, **tkwargs)
+    # Create Base Config
+    base_config = {
+        "warmup_steps": WARMUP_STEPS,
+        "num_samples": NUM_SAMPLES,
+        "thinning": THINNING,
+        "dimensions": DIM,
+        "n_initial": N_INITIAL,
+        "n_iterations": N_ITERATIONS,
+        "batch_size": BATCH_SIZE,
+    }
 
-    # Identify Best Initial Points
-    best_train = train_Y.min().item()
-    best_test = test_Y.min().item()
-    print(f"Best Initial (train) Point: {best_train:.3f}")
-    print(f"Best Initial (test) Point: {best_test:.3f}")
+    # Test Different Acquisition Functions
+    acqf = {
+        "Expected Improvement (MC)": qExpectedImprovement,
+        "Log Expected Improvement (MC)": qLogExpectedImprovement,
+        "Probability of Improvement (MC)": qProbabilityOfImprovement,
+        "Knowledge Gradient (MC)": qKnowledgeGradient,
+        "Max Value Entropy (MC)": qMaxValueEntropy,
+        "Lower Confidence Bound (MC)": qLowerConfidenceBound,
+        "Upper Confidence Bound (MC)": qUpperConfidenceBound,
+    }
 
-    # Optimization Loop
-    train_X, test_X, train_Y, test_Y = bayes_opt_loop(
-        datasets=(train_X, test_X, train_Y, test_Y),
-        mc_params=(WARMUP_STEPS, NUM_SAMPLES, THINNING),
-        eval_budget_params=(N_INITIAL, N_ITERATIONS, BATCH_SIZE),
-        dim=DIM,
-        acquisition_function=qLogExpectedImprovement
-    )
+    for acqf, acqf_label in zip(acqf.values(), acqf.keys()):
+        # Print "Header"
+        print(f"\nTesting {acqf_label}...")
 
-    # Plot Progress
-    progress_plot(train_Y, optimum=train_Y.min().item(), maximize=False,
-                  title=f"Branin, D = {DIM}")
+        # Update Config
+        config = base_config
+        config["acquisition_function"] = acqf_label
+
+        # Initialize Run
+        run = wandb.init(
+            entity="bayesian-optimization",
+            project="acquisition-functions",
+            name=acqf_label,
+            config=config,
+        )
+
+        # Generate Initial Datasets
+        print("Generating initial datasets...")
+        train_X, test_X, train_Y, test_Y = get_sobol_datasets(
+            DIM, N_INITIAL, 50, 1234, **tkwargs)
+
+        # Identify Best Initial Points
+        best_train = train_Y.min().item()
+        best_test = test_Y.min().item()
+        print(f"\tBest Initial (train) Point: {best_train:.3f}")
+        print(f"\tBest Initial (test) Point: {best_test:.3f}")
+
+        # Optimization Loop
+        print("Starting optimization loop...")
+        train_X, test_X, train_Y, test_Y = bayes_opt_loop(
+            datasets=(train_X, test_X, train_Y, test_Y),
+            mc_params=(WARMUP_STEPS, NUM_SAMPLES, THINNING),
+            eval_budget_params=(N_INITIAL, N_ITERATIONS, BATCH_SIZE),
+            dim=DIM,
+            acquisition_function=acqf,
+            run=run
+        )
+
+        # Finish
+        run.finish()
+        print(f"Finished testing {acqf_label}.")
 
 
 if __name__ == "__main__":
