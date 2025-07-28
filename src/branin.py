@@ -14,15 +14,22 @@ from botorch.models.transforms import Standardize
 from botorch.optim import optimize_acqf
 from botorch.test_functions import Branin
 
-from botorch.acquisition.logei import qLogExpectedImprovement
-from botorch.acquisition import (
-    qExpectedImprovement,
-    qProbabilityOfImprovement,
-    qKnowledgeGradient,
-    qMaxValueEntropy,
-    qLowerConfidenceBound,
-    qUpperConfidenceBound,
+# Load Analytic Acquisition Functions
+from botorch.acquisition.analytic import (
+    AnalyticAcquisitionFunction,
+    ExpectedImprovement,
+    ProbabilityOfImprovement,
+    LogExpectedImprovement,
+    LogProbabilityOfImprovement
 )
+
+# Load Monte-Carlo Acquisition Functions
+from botorch.acquisition.monte_carlo import (
+    qProbabilityOfImprovement,
+    qExpectedImprovement
+)
+from botorch.acquisition.logei import qLogExpectedImprovement
+
 
 def branin_function(x:torch.Tensor, **tkwargs) -> torch.Tensor:
     """
@@ -120,6 +127,11 @@ def bayes_opt_loop(datasets:tuple, mc_params:tuple, eval_budget_params:tuple,
 
     # Extract Evaluation Budget Hyperparameters
     N_INITIAL, N_ITERATIONS, BATCH_SIZE = eval_budget_params
+
+    if issubclass(acquisition_function, AnalyticAcquisitionFunction):
+        BATCH_SIZE = 1
+        N_ITERATIONS = 40
+
 
     # Optimization Loop
     for i in range(N_ITERATIONS):
@@ -227,13 +239,13 @@ def main():
 
     # Test Different Acquisition Functions
     acqf = {
-        "Expected Improvement (MC)": qExpectedImprovement,
-        "Log Expected Improvement (MC)": qLogExpectedImprovement,
-        "Probability of Improvement (MC)": qProbabilityOfImprovement,
-        "Knowledge Gradient (MC)": qKnowledgeGradient,
-        "Max Value Entropy (MC)": qMaxValueEntropy,
-        "Lower Confidence Bound (MC)": qLowerConfidenceBound,
-        "Upper Confidence Bound (MC)": qUpperConfidenceBound,
+        "Monte-Carlo Expected Improvement": qExpectedImprovement,
+        "Monte-Carlo Log Expected Improvement": qLogExpectedImprovement,
+        "Monte-Carlo Probability of Improvement": qProbabilityOfImprovement,
+        "Analytic Expected Improvement": ExpectedImprovement,
+        "Analytic Log Expected Improvement": LogExpectedImprovement,
+        "Analytic Probability of Improvement": ProbabilityOfImprovement,
+        "Analytic Log Probability of Improvement": LogProbabilityOfImprovement,
     }
 
     for acqf, acqf_label in zip(acqf.values(), acqf.keys()):
@@ -243,6 +255,10 @@ def main():
         # Update Config
         config = base_config
         config["acquisition_function"] = acqf_label
+
+        if issubclass(acqf, AnalyticAcquisitionFunction):
+            config["batch_size"] = 1
+            config["n_iterations"] = 40
 
         # Initialize Run
         run = wandb.init(
