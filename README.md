@@ -41,6 +41,15 @@ optimization and its applications.
 This directory contains from-scratch implementations of Bayesian optimization
 methods and the methods of related topics.
 
+_Use the commands below to create a new Conda environment with all of the_
+_necessary dependencies:_
+```bash
+conda env create -f bo_env.yml
+conda activate bo-env
+```
+_Note that the commands above should also be used to create an environment_
+_to run the notebooks in the `examples` directory._
+
 
 ## 📚 References
 Below is a list of reference texts, papers, and other sources on Bayesian
