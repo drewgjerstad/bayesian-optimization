@@ -17,5 +17,5 @@ format:
                \usepackage{amssymb}
                \DeclareMathOperator*{\argmax}{\text{arg}\max}
                \DeclareMathOperator*{\argmin}{\text{arg}\min}
-jupyter: conda-env-main-env-py
+jupyter: conda-env-bo-env-py
 ---

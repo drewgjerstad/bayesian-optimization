@@ -17,7 +17,7 @@ format:
                \usepackage{amssymb}
                \DeclareMathOperator*{\argmax}{\text{arg}\max}
                \DeclareMathOperator*{\argmin}{\text{arg}\min}
-jupyter: conda-env-main-env-py
+jupyter: conda-env-bo-env-py
 bibliography: acquisition-functions.bib
 csl: /Users/drewgjerstad/repos/bayesian-optimization/acm.csl
 nocite: |
@@ -86,13 +86,24 @@ table of potential values for \alpha (pg 135) from Jones
 
 \newpage
 # Information-Theoretic Acquisition Functions
+<!--
+Incorporate and reference BoTorch tutorials notebook and BoTorch docs!
+-->
 
 ## Knowledge Gradient (KG)
 
-## Mutual Information (MI) and Entropy Search (ES)
+## Mutual Information (MI)
 <!---
 entropy search uses the MI acquisition function
 -->
+
+## Entropy Search (ES)
+
+### Predictive Entropy Search (PES)
+
+### Max-Value Entropy Search (MES)
+
+### Joint Entropy Search (JES)
 
 \newpage
 # Acquisition Functions from Multi-Armed Bandits
@@ -102,7 +113,7 @@ See first page for extension of MAB to optimization using IAB
 
 ## Statistical Upper Confidence Bound (UCB)
 
-## Thompson Sampling
+## Thompson Sampling (TS)
 
 \newpage
 # Constructing Acquisition Functions
@@ -110,7 +121,27 @@ See first page for extension of MAB to optimization using IAB
 For policy construction: (1) one-step lookahead, (2) policies from MABs
 -->
 
+## Approximation: Lookahead
+
+### Special Case: One-Step Lookahead
+
+## Approximation: Rollout
+
+## The Multi-Armed Bandit Approach
+
+## The Monte Carlo Approach
+<!--
+Incorporate ideas from the BoTorch paper by Balandat et al. (2020)
+-->
+
 # Computing Acquisition Functions
+<!--
+Discuss efficient computation details from Garnett Chapter 7, 8
+
+Discuss the design philosophy of BoTorch (state-of-the-art)
+
+Discuss maximizing acquisition functions paper by Wilson et al. (2018)
+-->
 
 \newpage
 # References
