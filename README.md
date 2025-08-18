@@ -50,6 +50,14 @@ conda activate bo-env
 _Note that the commands above should also be used to create an environment_
 _to run the notebooks in the `examples` directory._
 
+ * [**`branin.py`**](src/branin.py)  
+   _This Python script compares the performance of analytic and monte-carlo_
+   _acquisition functions implemented in BoTorch on the Branin function_
+   _embedded in higher dimensions. The performance of each acquisition function_
+   _is automatically tracked using Weights & Biases. To run the script, use_
+   _this command: `python3 branin.py` (after activating the `bo-env`_
+   _environment)._
+
 
 ## 📚 References
 Below is a list of reference texts, papers, and other sources on Bayesian

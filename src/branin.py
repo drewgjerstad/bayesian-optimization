@@ -5,7 +5,6 @@ the BoTorch tutorial for SAASBO (extended for other purposes).
 """
 
 # Load Dependencies
-import wandb
 import torch
 from torch.quasirandom import SobolEngine
 from botorch import fit_fully_bayesian_model_nuts
@@ -29,6 +28,9 @@ from botorch.acquisition.monte_carlo import (
     qExpectedImprovement
 )
 from botorch.acquisition.logei import qLogExpectedImprovement
+
+# Load Tracking
+import wandb
 
 
 def branin_function(x:torch.Tensor, **tkwargs) -> torch.Tensor:
