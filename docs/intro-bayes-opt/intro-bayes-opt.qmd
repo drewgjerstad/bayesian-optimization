@@ -36,25 +36,23 @@ import matplotlib.pyplot as plt
 \newpage
 # Introduction
 **Bayesian optimization** refers to an optimization approach that uses Bayesian
-inference to guide the optimizer to make "better" decisions based on
-_uncertainty_. In addition, this approach provides a framework that enables us
-to strategically tackle the uncertainty inherent in all optimization decisions.
-One particularly attractive property of this framework is its _unparalleled_
-sample efficiency, a property we will discuss more in-depth later.
+inference to guide the optimizer to make "better" decisions under _uncertainty_.
+In addition, this approach provides a framework that enables us to strategically
+tackle the uncertainty inherent in all optimization decisions. One particularly
+attractive property of this framework is its unparalleled _sample efficiency_
+which refers to its ability to progress towards optima "quicker" than other
+optimization approaches. We will discuss this property in more detail later.
 
-In these notes, the goal is to introduce Bayesian optimization from a high-level
-perspective and introduce the components involved in the "Bayesian optimization
-workflow". Additional notes discussing the components and related topics in
-detail are available in the
+The goal of these notes is to introduce the notion of Bayesian optimization from
+a high-level perspective as well as introduce the components (often referred to
+as _primitives_) involved in the so-called "Bayesian optimization workflow".
+Each of these components, their importance, and how they fit into the workflow
+will be discussed in detail in other sets of notes. The list of links below
+route to sets of notes discussing these components in addition to topics related
+to Bayesian optimization. Note that these notes as well as examples, tutorials,
+and from-scratch implementations can be found in the
 [`bayesian-optimization`](https://github.com/drewgjerstad/bayesian-optimization)
-repository and are linked below. We will begin with the motivation behind
-Bayesian optimization, primarily focusing on the theoretical motivation and
-examples of real-world Bayesian optimization applications.
-
-
-## Additional Notes
-The links below lead to other notes in the `bayesian-optimization` repo,
-discussing the components in and topics related to Bayesian optimization.
+GitHub repository.
 
 * [**Bayesian Decision Theory**](https://github.com/drewgjerstad/bayesian-optimization/blob/main/docs/bayes-decision-theory/bayes-decision-theory.pdf)
 * [**Gaussian Processes**](https://github.com/drewgjerstad/bayesian-optimization/blob/main/docs/gaussian-processes/gaussian-processes.pdf)
@@ -62,25 +60,32 @@ discussing the components in and topics related to Bayesian optimization.
 * [**Model Evaluation and Selection**](https://github.com/drewgjerstad/bayesian-optimization/blob/main/docs/model-evaluation/model-evaluation.pdf)
 * [**Utility Functions**](https://github.com/drewgjerstad/bayesian-optimization/blob/main/docs/utility-functions/utility-functions.pdf)
 * [**Acquisition Functions**](https://github.com/drewgjerstad/bayesian-optimization/blob/main/docs/acquisition-functions/acquisition-functions.pdf)
-* [**Computing Acquisition Functions**](https://github.com/drewgjerstad/bayesian-optimization/blob/main/docs/computing-acq-functions/computing-acq-functions.pdf)
 * [**GP Regression**](https://github.com/drewgjerstad/bayesian-optimization/blob/main/docs/gp-regression/gp-regression.pdf)
 * [**GP Classification**](https://github.com/drewgjerstad/bayesian-optimization/blob/main/docs/gp-classification/gp-classification.pdf)
+
+Before we jump into formalizing the idea of Bayesian optimization, we first
+pause to discuss the motivation--both theoretical and practical--behind such an
+approach.
+
 
 \newpage
 # Motivation
 
 ## Theoretical Motivation
 First, we consider the theoretical motivation for the Bayesian optimization
-approach. Typically, the theoretical motivation steps from the form or type of
-_objective_ (the "function" we are aiming to optimize). Note that the list below
-is by no means exhaustive; there exists additional theoretical motivation but
-these are seemingly the most common, particularly with regard to the form and
-characteristics of the objective.
+approach. Typically, the theoretical motivation stems from the characteristics
+of the _objective_--the "function" we are aiming to optimize. Keep in mind that
+the _objective "function"_ does not have to be a boilerplate mathematical
+expression and could be a score representing how a particular "solution" (i.e.,
+set of parameters) performs. Furthermore, the list below is by no means
+exhaustive; there exists additional theoretical motivation but these are
+seemingly the most common, particularly with regard to the characteristics of 
+the objective.
 
  * **Black-box objective functions** are functions that we can only interact
-   with via its inputs and outputs meaning classical, analytical methods do not
-   work. However, we can usually use Bayesian optimization to approximate such
-   an objective and manage the inherent uncertainty.
+   with via its inputs and outputs meaning classical, analytical methods (such
+   as gradient-based ones) do not work. In such cases, Bayesian optimization
+   allows us to approximate such an objective while managing the uncertainty.
 
  * **Expensive-to-evaluate objective functions** are functions that require
    significant computation effort to obtain their output. However, just as with
@@ -91,13 +96,13 @@ characteristics of the objective.
    analytical evaluation (or, if analytical evaluation is expensive).
 
  * In some spaces such as the discrete or combinatorial ones, the objective may
-   not have efficient gradients (if they exist). Thus, classical gradient-based
-   optimization methods are incompatible.
+   not have efficient gradients (if they exist at all). Thus, classical
+   gradient-based optimization methods are incompatible.
 
 ## Applications
-The application potential of Bayesian optimization can be seen across several
-critical domains, especially those attempting to accelerate the identification
-of solutions to real-world scientific and engineering problems. Some of these
+The potential applicability of Bayesian optimization can be seen across several
+critical domains, especially those that aim to accelerate the identification
+of solutions to real-world scientific and engineering problems. These
 applications include:
 
  * Drug discovery
@@ -105,96 +110,125 @@ applications include:
  * Materials design
  * AutoML (i.e., hyperparameter tuning)
  * Engineering decisions
- * Many more...
 
-The diagrams in the next few sections are there to illustrate how the Bayesian
-optimization approach is used in real-world applications. There will also be
-commentary explaining why the approach is so useful in these applications. Just
-as with the list above, this is not (in any way) an exhaustive review of
-applications. Rather, the point of these sections is to showcase the real-world
-motivation for this optimization approach.
+The applications presented on the next few pages illustrate how this approach is
+used for real-world applications. Alongside each graphic are some brief comments
+explaining why the approach is advantageous. Once again, similar to the list of
+theoretical motivations, this is not an exhaustive review but rather a concise
+showcase of where the approach comes in handy.
 
 \newpage
 ### Application: Drug Discovery
-Figure 1 below shows an example of a chemical process optimization problem,
-common in drug discovery. In the left half of the figure, four common
-(classical) approaches are shown but these approaches are expensive.
-Alternatively, the Bayesian optimization approach is shown in the right half.
-That approach uses data from previous experiments to locate points that may
-optimize the unknown objective, while strategically handling uncertainty in the
-model. The located points will usually be used to plan future experiments as
-they represent samples of _high utility_ (i.e., the point should be useful in
-optimizing the reaction parameter).
+Figure 1 below illustrates an example of a chemical process optimization problem
+that is common in drug discovery. On the left side, four classical approaches
+are shown but there is one issue with these approaches: they are expensive. In
+general, such approaches are expensive due to the cost of preparing and
+executing experiments in a lab. Ideally, we should use the results from previous
+experiments to help us design future experiments--exactly where Bayesian
+optimization comes into play.
+
+Thus, an alternative to the expensive classical approaches, the Bayesian
+optimization approach shown on the right side uses a model of the objective
+(where the objective is a _reaction parameter_ representing the characteristics
+of a reaction) to principally select the next chemicals to test while handling
+the uncertainty in the model. Specifically, the data from previous experiments
+is used to locate points that may optimize the unknown objective and these
+located points should be used when planning future experiments. Furthermore,
+these located points typically represent samples of _high utility_, where high
+utility refers to the property of a sample that is expected to be useful in
+optimizing the reaction parameter.
 
 ![From _Bayesian optimization as a tool for chemical synthesis_ by
-Shields et al. (2021)](graphics/applications/drug-discovery.png){width=350}
+Shields et al. (2021)](graphics/applications/drug-discovery.png){width=600}
 
+\newpage
 ### Application: Molecule/Protein Discovery
 In the field of molecule and protein design, there are similar considerations to
 the ones in the previous application: experiments are costly. Figure 2 shows the
 integration of the Bayesian optimization approach with experimentation. In most
 environments, scientists synthesize and test several different formulations to
-obtain a dataset. This dataset is used to help model the underlying objective
-and can be used to suggest new, promising formulations. Then, as shown in the
-figure, the new formulations are synthesized, tested, and added to the dataset
-so as to inform the model and optimizer of formulations to suggest next.
+obtain a dataset. Then, this dataset is used to help model the underlying
+objective and can be used to suggest new, promising formulations. After making
+suggestions, the new formulations are synthesized, tested, and added to the
+dataset so as to inform the model and optimizer of formulations to suggest next.
 
 ![From _Sequential closed-loop Bayesian optimization as a guide for organic_
 _molecular metallophotocatalyst formulation discovery_ by Li et al. (2024)](
   graphics/applications/molecule-protein-discovery.png){width=300}
 
-\newpage
 ### Application: Materials Discovery
-Figure 3 is similar to the one for molecule/protein discovery but now it is
-showcasing some additional details specific to materials design and discovery.
-Again, the initial dataset is used to model the underlying objective and inform
-design exploration, with results from design exploration being used to augment
-the dataset. Additionally, in this particular example, the researchers also use
-the experiments to assist in calibrating a simulation of designs, another
+Figure 3 is similar in style to Figure 2 except now it showcases some additional
+details specific to the design and discovery of materials. Once again, the
+initial dataset is used to model the underlying objective and inform design
+exploration where the results from exploration being used to augment the
+dataset. Furthermore, in this particular example, the researchers are also using
+the results of experiments to calibrate a simulation of designs, another
 application of Bayesian optimization.
 
 ![From _Bayesian optimization for Materials Design with Mixed Quantitative and_
 _Qualitative Variables_ by Zhang et al. (2020)](
   graphics/applications/materials-design.jpg){width=425}
 
+\newpage
 ### Application: AutoML
-Figure 4 shows a workflow to tune neural network hyperparameters using Bayesian
-optimization, specifically using a Gaussian process as a surrogate model. AutoML
-is the process of automating the machine learning workflow and typically
-includes tuning models' hyperparameters. We can use Bayesian optimization to
-perform this tuning in a more efficient manner by identifying the next set of
-promising hyperparameters based on the current model and its uncertainty.
+Figure 4 demonstrates a workflow for tuning hyperparameters for a neural network
+using Bayesian optimization, using a Gaussian process as a surrogate model. For
+some context, _AutoML_ is the process of automating the machine learning
+workflow with regard to tuning models' hyperparameters to optimize performance.
+While other methods for this task exist, such as randomized search and grid
+search, they are often computationally expensive or lack a principled approach
+to aid in finding the optimal set of hyperparameters.
+
+Instead, we can use Bayesian optimization to perform this tuning in a more
+efficient manner by identifying the next set of promising hyperparameters based
+on the current model and its uncertainty. One particular reason that using the
+Bayesian optimization approach for AutoML is advantageous is that continuous
+hyperparameters only represent a _very_ small subset of machine learning
+hyperparameters. For instance, many hyperparameters are discrete such as the
+number of hidden layers in a network or are categorical such as the choice of
+activation function for network layers. Therefore, these cannot be optimized
+using traditional (i.e., gradient-based) methods.
 
 ![From _Achieve Bayesian optimization for tuning hyperparameters_ by Edward
-Ortiz on _Medium_ (2020)](graphics/applications/automl.png){width=325}
+Ortiz on _Medium_ (2020)](graphics/applications/automl.png){width=500}
 
 \newpage
 ### Application: Engineering Decisions
-Figure 5 shows how Bayesian optimization can be used to calibrate a particle
-accelerator in a similar manner to the previous applications. The "operator"
-inputs the target beam parameters while a camera inputs the observed beam
-parameters. Then, Bayesian optimization determines the changes (i.e., the next
-set of beam parameters) to ideally improve the calibration of the particle
-accelerator.
+Figure 5 illustrates how Bayesian optimization can be used to calibrate a
+particle accelerator in a similar manner to the previous applications. The
+"operator" inputs the target beam parameters while a camera inputs the observed
+beam parameters. Then, Bayesian optimization determines the changes (i.e., the
+next set of beam parameters) to ideally improve the calibration of the particle
+accelerator. This type of task is similar to AutoML: we want to identify a set
+of parameters that optimize performance (an integral part of engineering design
+and corresponding decisions). Once again, many of these parameters are discrete
+or categorical meaning we cannot rely on traditional methods.
 
 ![From _Reinforcement learning-trained optimizers and Bayesian optimization for_
 _online particle accelerator tuning_ by Kaiser et al. (2024)](
-  graphics/applications/engineering-decisions.png){width=450}
+  graphics/applications/engineering-decisions.png){width=600}
 
 \newpage
 # Optimization Foundations
-**Optimization** is a process and field of study that aims to efficiently locate
-the optimal objective value and/or its location from the search domain and its
-corresponding objective values. In this section, we will introduce the
-foundations of optimization to understand the ideas that Bayesian optimization
-builds on. For a more thorough review of optimization, see Nocedal and Wright's
-_Numerical Optimization_ book (in the Springer Series in Operations Research).
+In this section, we introduce the foundations of optimization to help understand
+the ideas that Bayesian optimization builds on. We will discuss formalizing
+optimization problems, objective functions, observation models, optimization
+policies, and termination policies.
+
+ * **Optimization** is a process and field of study that aims to efficiently
+   locate the optimal objective value and/or its location from the search
+   domain.
+
+For a more thorough review of optimization, the reader is directed to Nocedal
+and Wright's _Numerical Optimization_ book (in the Springer Series in Operations
+Research). We begin with an introduction to formalizing an optimization problem.
 
 ## Formalization of Optimization
-Let's first formalize a typical optimization problem. This formulation is a
-simple and flexible one for global optimization and is not inherently Bayesian.
-Additionally, it is also formulating a _continuous_ optimization problem but
-there exists other "types" of optimization other than just continuous.
+First, let's formalize a typical optimization problem. Notice that the
+formulation here is a simple and flexible one for global optimization and is not
+inherently Bayesian. Additionally, while the formulation below does imply
+_continuous_ optimization, it could be modified to support other types of
+inputs such as discrete, categorical, etc.
 
 \begin{equation*}
     x^* \in \argmax_{x \in \mathcal{X}} f(x)
@@ -205,18 +239,28 @@ there exists other "types" of optimization other than just continuous.
 where $f:\mathcal{X}\rightarrow\mathbb{R}$ is a real-valued _objective function_
 on some domain $\mathcal{X}$, $x^*$ is the point that obtains the global maximum
 value $f^*$. Note that the $\max$ versus $\min$ is arbitrary and depends on the
-specific problem.
+entirely on the problem at hand.
 
-_Black-box optimization_ arises from the fact that we do not need to have an
-explicit objective function $f$ but rather only some information about the
-objective at identified points.
+ * **Black-box optimization** arises from the fact that we do not need (or do
+   not have access to) an explicit objective function $f$ but rather only some
+   information about the objective at identified points.
 
-The plot below shows an objective function with its _optima_ labeled. **Optima**
-are the points that either maximize or minimize (optimize) the objective
-function. The objective function plotted below is given by
+The plot below illustrates an objective function with both its global and local
+_optima_ labeled.
+
+ * **Optima** are the points that either maximize or minimize (optimize) the
+   objective function.
+
+The objective function plotted is given by the following expression:
 \begin{equation*}
     f(x) = 10\sin(0.2x)\cos(0.1x) + \sin(0.5x) + 0.05x
 \end{equation*}
+
+Note that the optima for the objective function $f(x)$ were located by obtaining
+the values of the objective at each point in the _domain_. However, in
+optimization, we usually want to avoid such computations due to the associated
+cost of doing so. Specifically, we prefer methods that locate the optima in a
+more efficient manner.
 
 ```{python}
 #| label: objective-with-optima
@@ -240,6 +284,7 @@ plt.scatter(x[np.argmax(y[800:]) + 800], np.max(y[800:]), label="Local Max",
 plt.scatter(x[np.argmin(y[200:400]) + 200], np.min(y[200:400]),
             label="Local Min", c="k", marker="D")
 plt.xlim((0, 75))
+plt.ylim((-10, 10))
 plt.title("Objective Function with Optima Labeled")
 plt.xlabel("Observation")
 plt.ylabel("Objective Value")
@@ -247,26 +292,27 @@ plt.legend()
 plt.show()
 ```
 
-In the plot on the previous page, the optima were found by obtaining the values of the
-objective at every point in the _domain_. However, in optimization, we typically
-want to avoid such computations due to its expensiveness and rather use methods
-to find the optima in a more efficient manner. Furthermore, in the event we are
-dealing with _black-box optimization_, recall that we don't necessarily have an
-explicit objective but rather inputs and their corresponding outputs. That means
-that evaluating the objective function at each point in the domain is not only
-inefficient but effectively impossible.
+Furthermore, if we face a _black-box objective_ then we don't have an explicit
+mathematical expression for the objective that we can evaluate across the
+domain. Instead, we have the inputs and their corresponding outputs at a select
+number of points and must go from there.
 
 ## Objective Functions
-The **objective function** is the function that we want to optimize. For some
-problems, there is a mathematical model that can be developed to describe the
-objective. However, in many real-world applications, there is no analytical or
-mathematical model to describe the objective (one of the motivations for
-Bayesian optimization).
+The **objective function** is the function that we want to optimize. Recall that
+this does not necessarily have to be a function in the typical mathematical
+sense. Instead, as is common in many practical cases, the objective function
+represents a score for a given input such as the reaction parameter in the drug
+discovery example or the classification accuracy of a neural network in the
+AutoML example. Furthermore, in many of these real-world applications, there is
+no analytical or mathematical model to describe the objective--serving as one of
+the motivations for Bayesian optimization.
 
-Some objective functions are convex with only a single, unique global minimum
-or maximum. Other functions are non-convex and might have several local optima
-or a flat region with many saddle points. The plot below shows these three
-general types of objectives.
+In general, objective functions often have different characteristics which
+impact how various optimization approaches behave. For instance, three different
+objective functions are plotted below with one being convex and two being
+non-convex. The left plot is convex and has a unique optimum, the middle plot is
+non-convex with several optima, and the right plot is non-convex with saddle
+points and a unique optima.
 
 ```{python}
 #| label: objective-fcn-types
@@ -283,9 +329,9 @@ def objective_non_convex_saddle(x:np.array)->np.array:
 
 x = np.linspace(0, 10, 1000)
 
-fig, ax = plt.subplots(nrows=1, ncols=3, figsize=(16, 4))
+fig, ax = plt.subplots(nrows=1, ncols=3, figsize=(16, 4.5))
 ax[0].plot(x, objective_convex(x))
-ax[0].set_title("Convex with\n Unique Optima")
+ax[0].set_title("Convex with\n Unique Optimum")
 ax[1].plot(x, objective_non_convex(x))
 ax[1].set_title("Non-Convex with\nSeveral Optima")
 ax[2].plot(x, objective_non_convex_saddle(x))
@@ -296,10 +342,20 @@ for i in range(len(ax)):
 plt.show()
 ```
 
-While the plots showing non-convex objective functions pose difficulty to
-efficiently optimize such functions, there are other characteristics (listed
-below) of objective functions common in Bayesian optimization that also lead to
-issues.
+Since the plot on the left is convex, we can apply gradient-based methods and,
+in conjunction with a reasonable learning rate, locate the unique optimum.
+However, the middle and right-side plots are much more difficult. Consider the
+middle plot, for example. Using gradient-based methods runs the risk that we
+become "trapped" in one of the local optima and not reach the global optimum
+(global minimum: $x\approx 5.75$, global maximum: $x\approx 2.5$). Another
+troubling case is the one depicted in the plot on the right: saddle points.
+Saddle points are problematic for classical methods since they form a flat
+region prohibiting the progression of the optimizer towards the optimum.
+
+Additionally, while the two plots to the right show non-convex functions which
+are problematic to optimize, there are other characteristics of objective
+functions that can lead to issues and are typically addressed via the Bayesian
+optimization approach. Such characteristics include:
 
  * The objective is considered to be a _black-box_ function meaning we can
    only interact with the objective via its inputs and outputs.
@@ -308,10 +364,10 @@ issues.
    not represent the exact true objective value at that location.
 
  * The objective has a _high cost_ of evaluation and requires a sample efficient
-   method to avoid expensive probing.
+   method to avoid expensive probing (evaluation).
 
- * There _do not exist gradients_ (if we did, efficient gradient-based methods
-   could be employed to locate and evaluate optima).
+ * There _do not exist gradients_ (if there were, efficient gradient-based
+   methods could be employed to locate and evaluate optima).
 
 ## Observation Models
 Observation models are similar to the idea of surrogate models used in the
