@@ -310,7 +310,7 @@ the motivations for Bayesian optimization.
 In general, objective functions often have different characteristics which
 impact how various optimization approaches behave. For instance, three different
 objective functions are plotted below with one being convex and two being
-non-convex. The left plot is convex and has a unique optimum, the middle plot is
+non-convex. The left plot is convex and has a unique optimum, the center plot is
 non-convex with several optima, and the right plot is non-convex with saddle
 points and a unique optima.
 
@@ -342,20 +342,19 @@ for i in range(len(ax)):
 plt.show()
 ```
 
-Since the plot on the left is convex, we can apply gradient-based methods and,
-in conjunction with a reasonable learning rate, locate the unique optimum.
-However, the middle and right-side plots are much more difficult. Consider the
-middle plot, for example. Using gradient-based methods runs the risk that we
-become "trapped" in one of the local optima and not reach the global optimum
-(global minimum: $x\approx 5.75$, global maximum: $x\approx 2.5$). Another
-troubling case is the one depicted in the plot on the right: saddle points.
-Saddle points are problematic for classical methods since they form a flat
-region prohibiting the progression of the optimizer towards the optimum.
+Since the plot on the left is convex, we can apply gradient-based methods to
+locate the unique optimum. However, the center and right-side plots are more
+difficult. Consider the center plot, for example. If we use gradient-based
+methods then we run the risk that we become "trapped" in one of the local optima
+and not reach the global optimum (global minimum: $x\approx 5.75$, global
+maximum: $x\approx 2.5$). Another troubling case is depicted in the plot on the
+right: saddle points. Saddle points are problematic for classical methods since
+they form a flat region which prohibits the optimizer from reaching the optimum.
 
-Additionally, while the two plots to the right show non-convex functions which
-are problematic to optimize, there are other characteristics of objective
-functions that can lead to issues and are typically addressed via the Bayesian
-optimization approach. Such characteristics include:
+Beyond these challenges, there are other characteristics that objective
+functions may have which lead to issues and are typically addressed via the
+Bayesian optimization approach. Such characteristics coincide with the
+theoretical motivation and include:
 
  * The objective is considered to be a _black-box_ function meaning we can
    only interact with the objective via its inputs and outputs.
