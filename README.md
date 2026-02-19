@@ -7,13 +7,13 @@ that myself and others can use to better understand (and utilize) Bayesian
 optimization.
 
 > [!NOTE]
-> Special acknowledgement for the adapted content in this repository is due to
-> my advisor [Professor Aryan Deshwal](https://aryandeshwal.github.io)
-> (University of Minnesota) who teaches a special topics course entitled
-> _AI for Sequential Decision Making_ and [Roman Garnett, PhD](
-> https://www.cse.wustl.edu/~garnett/) and his brilliant book on Bayesian
-> optimization. Supplementary materials can be found in the [_References_](
-> #-references) section.
+> Special acknowledgement for content adapted and referenced in this repository
+> is owed to my advisor [Professor Aryan Deshwal](
+> https://aryandeshwal.github.io) (University of Minnesota) and his special
+> topics course entitled _AI for Sequential Decision Making_. Acknowledgement is
+> also owed to [Roman Garnett, PhD](https://www.cse.wustl.edu/~garnett/) and his
+> brilliant book on Bayesian optimization. For a complete list of supplementary
+> materials, please see the [_References_](#-references) section below.
 
 > [!TIP]
 > Please [raise an issue](
