@@ -1,15 +1,24 @@
 <img src="assets/banner.png" alt="Bayesian Optimization" width="1240">
 
-This repo contains my work with Bayesian optimization and related topics. The
-primary goal of this repo is to develop and curate a set of resources that
-myself and others can use to better understand (and utilize) Bayesian
+# Bayesian Optimization
+This repository contains my work with Bayesian optimization and related topics.
+The main goal of this repository is to develop and curate a set of resources
+that myself and others can use to better understand (and utilize) Bayesian
 optimization.
 
 > [!NOTE]
-> If you find any issues/typos or have any suggestions, feel free to
-> [raise an issue](
->  https://github.com/drewgjerstad/bayesian-optimization/issues/new/choose) and
-> let me know.
+> Special acknowledgement for the adapted content in this repository is due to
+> my advisor [Professor Aryan Deshwal](https://aryandeshwal.github.io)
+> (University of Minnesota) who teaches a special topics course entitled
+> _AI for Sequential Decision Making_ and [Roman Garnett, PhD](
+> https://www.cse.wustl.edu/~garnett/) and his brilliant book on Bayesian
+> optimization. Supplementary materials can be found in the [_References_](
+> #-references) section.
+
+> [!TIP]
+> Please [raise an issue](
+> https://github.com/drewgjerstad/bayesian-optimization/issues/new/choose) if
+> you notice any issues, typos, and/or have any suggestions. Thanks!
 
 ## 📁 `docs`
 This directory contains notes/tutorials on Bayesian optimization and related
