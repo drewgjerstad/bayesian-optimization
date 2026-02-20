@@ -1,3 +1,5 @@
+<img src="assets/banner.png" alt="Bayesian Optimization" width="1240">
+
 # Bayesian Optimization
 This repository contains my work with Bayesian optimization and related topics.
 The main goal of this repository is to develop and curate a set of resources
