@@ -13,7 +13,7 @@ optimization.
 > topics course entitled _AI for Sequential Decision Making_. Acknowledgement is
 > also owed to [Roman Garnett, PhD](https://www.cse.wustl.edu/~garnett/) and his
 > brilliant book on Bayesian optimization. For a complete list of supplementary
-> materials, please see the [_References_](#-references) section below.
+> materials, please see the [_References_](#references) section below.
 
 > [!TIP]
 > Please [raise an issue](
@@ -69,30 +69,16 @@ _to run the notebooks in the `examples` directory._
    _environment)._
 
 
-## 📚 References
+## References
 Below is a list of reference texts, papers, and other sources on Bayesian
 optimization and related topics. The BibTeX entries can be found in the
-[**`bibliography.bib`**](bibliography.bib) file.
+[**`assets/bibliography.bib`**](assets/bibliography.bib) file.
 
+### Reference Texts
  * _Bayesian Optimization_ by Roman Garnett (2023)
  * _Bayesian Optimization: Theory and Practice Using Python_ by Peng Liu (2023)
  * _Gaussian Processes for Machine Learning_ by Rasmussen & Williams (2019)
 
+### Papers
 
-<!---
-Topics
- - Bayesian Decision Theory
-    - Garnett Chapter 5, Liu Chapter 3, Garnett 9.3
- - Gaussian Processes
-    - Garnett Chapter 2/3, Liu Chapter 2, R+W Appendix B, Garnett 9.1
- - Covariance Functions and Kernels
-    - R+W Chapter 4
- - Model Evaluation and Selection
-    - Garnett Chapter 4
- - Acquisition Functions
-    - Garnett Chapter 7, Chapter 8, Garnett 9.2
- - GP Regression
-    - R+W Chapter 2
- - GP Classification
-    - R+W Chapter 3
---->
+### Other
