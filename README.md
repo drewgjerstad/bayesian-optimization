@@ -1,4 +1,4 @@
-<img src="assets/banner.png" alt="Bayesian Optimization" width="1240">
+<img src="assets/short-banner.png" alt="Bayesian Optimization" width="1240">
 
 # Bayesian Optimization
 This repository contains my work with Bayesian optimization and related topics.
