@@ -38,17 +38,17 @@ topics.
 ## 📁 `examples`
 This directory contains notebooks exploring various examples of Bayesian
 optimization and its applications.
+ * [**Introduction to GPyTorch and GAUCHE**](examples/gpytorch_and_gauche.ipynb)  
+    _This notebook synthesizes information from GPyTorch and GAUCHE's_
+    _documentation regarding Gaussian processes for machine learning and how to_
+    _apply them to irregular-structured input representations (i.e., molecular,_
+    _graph, etc.)._
  * [**BoTorch Tutorials**](examples/botorch_tutorials/)  
     _This directory contains tutorials from BoTorch's documentation._
      * [Trust Region Bayesian Optimization with TuRBO](examples/botorch_tutorials/turbo_tutorial.ipynb)
      * [High-Dimensional Bayesian Optimization with SAASBO](examples/botorch_tutorials/saasbo_tutorial.ipynb)
      * [Implementing Custom Acquisition Functions](examples/botorch_tutorials/custom_acqf_tutorial.ipynb)
      * [Information-Theoretic Acquisition Functions](examples/botorch_tutorials/inf_theoretic_acqf_tutorial.ipynb)
- * [**Introduction to GPyTorch and GAUCHE**](examples/gpytorch_and_gauche.ipynb)  
-    _This notebook synthesizes information from GPyTorch and GAUCHE's_
-    _documentation regarding Gaussian processes for machine learning and how to_
-    _apply them to irregular-structured input representations (i.e., molecular,_
-    _graph, etc.)._
 
 ## 📁 `src`
 This directory contains from-scratch implementations of Bayesian optimization
