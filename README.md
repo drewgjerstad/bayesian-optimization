@@ -38,6 +38,14 @@ topics.
 ## 📁 `examples`
 This directory contains notebooks exploring various examples of Bayesian
 optimization and its applications.
+ * [**Introduction to GPyTorch**](examples/gpytorch_intro.ipynb)  
+   _This notebook serves as an introductory guide to defining a Gaussian_
+   _process (GP) model using GPyTorch and using it to "learn" an underlying_
+   _function._
+ * [**Bayesian Optimization Basics with GPyTorch and BoTorch**](examples/bayes_opt_basics.ipynb)  
+   _This notebook illustrates how we can use GPyTorch and BoTorch to_
+   _efficiently implement a Bayesian optimization loop in Python to optimize_
+   _the Hartmann objective function._
  * [**Introduction to GPyTorch and GAUCHE**](examples/gpytorch_and_gauche.ipynb)  
     _This notebook synthesizes information from GPyTorch and GAUCHE's_
     _documentation regarding Gaussian processes for machine learning and how to_
